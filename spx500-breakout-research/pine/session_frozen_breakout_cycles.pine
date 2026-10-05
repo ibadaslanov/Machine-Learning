@@ -24,6 +24,8 @@ strategy("Session + Frozen Breakout: cycle strategy", overlay=true, pyramiding=0
 //   Weekly cycle     : trading starts on "Week starts on" at "Cycle hour" and runs until the
 //                      last candle of the week ("start on one day and continue until the week is over")
 //   Fixed hours      : every trade is closed "Hold hours" after it was opened
+//   A cycle/week end that falls inside a market break (or a holiday Friday) can't be seen in
+//   advance; the trade is then closed at the close of the first candle after the break.
 //
 // ENTRY RULE
 //   Stop and reverse : every break flips the position (original)
@@ -124,22 +126,38 @@ if na(curCyc) or cycId != curCyc
     tradesAtCycleStart := prevTrades
 done = tradesNow > tradesAtCycleStart
 
+// the open trade's entry candle (its open time, like the backtest's entry hour; with the Bar Magnifier
+// strategy.opentrades.entry_time can be an intrabar time) and the cycle / week it was opened in
+pos = strategy.position_size
+wkNow = weekId(time)
+var int entryBarTime = na
+var int entryCyc     = na
+var int entryWeek    = na
+if tradesNow > prevTrades and pos != 0
+    entryBarTime := time
+    entryCyc     := cycId
+    entryWeek    := wkNow
+
 lastOfWeek   = session.islastbar and dayofweek(time, "UTC") == dayofweek.friday
-newCycleNext = MODE == "Daily cycle" ? dayCycle(tn) != dayCycle(time) : MODE == "Weekly cycle" ? weekId(tn) != weekId(time) : false
+newCycleNext = MODE == "Daily cycle" ? dayCycle(tn) != dayCycle(time) : MODE == "Weekly cycle" ? weekId(tn) != wkNow : false
 
 // ---------- 4. forced exits ----------
-pos = strategy.position_size
 bool weekEndNow = (WF or MODE == "Weekly cycle") and lastOfWeek and pos != 0
-bool timeUp     = MODE == "Fixed hours" and pos != 0 and strategy.opentrades > 0 and tn - strategy.opentrades.entry_time(strategy.opentrades - 1) >= N * HOUR_MS
+// a cycle or week end that fell inside a market break (boundary hour missing, holiday Friday, early close
+// that session.islastbar doesn't flag): the trade is still open in a later cycle/week, so close it now
+bool stale      = pos != 0 and not na(entryCyc) and (((MODE == "Daily cycle" or MODE == "Weekly cycle") and entryCyc != cycId) or ((WF or MODE == "Weekly cycle") and entryWeek != wkNow))
+bool timeUp     = MODE == "Fixed hours" and pos != 0 and not na(entryBarTime) and tn - entryBarTime >= N * HOUR_MS
 bool cycleUp    = newCycleNext and pos != 0
 if weekEndNow
     strategy.close_all(comment="week end", immediately=true)      // filled at this candle's close
+else if stale
+    strategy.close_all(comment="missed cycle end", immediately=true)  // filled at this candle's close
 else if cycleUp
     strategy.close_all(comment="cycle end")                       // filled at the next candle's open
 else if timeUp
     strategy.close_all(comment=str.tostring(N) + "h exit")        // filled at the next candle's open
 // position as it will be when the next candle's orders become active
-posNext = (weekEndNow or cycleUp or timeUp) ? 0.0 : pos
+posNext = (weekEndNow or stale or cycleUp or timeUp) ? 0.0 : pos
 
 // ---------- 5. may the next candle open a trade? ----------
 activeNext = MODE != "Weekly cycle" or (weekPos(tn) >= startIdx * 24 + R)
@@ -163,23 +181,25 @@ strategy.cancel("xS")
 
 if not na(nH) and not na(nL) and not skipNext
     if not holding
-        // stop and reverse: the opposite entry reverses; a side we may not open just closes
-        if canOpen and allowLong and posNext <= 0
+        // stop and reverse: both sides every candle, whatever the position, so a candle that breaks
+        // both levels reverses twice like the backtest (pyramiding=0 rejects the side already held);
+        // a side we may not open just closes (also a position opened earlier in the same candle)
+        if canOpen and allowLong
             if FADE
                 strategy.entry("L", strategy.long, limit=longPx)
             else
                 strategy.entry("L", strategy.long, stop=longPx)
-        if canOpen and allowShort and posNext >= 0
+        if canOpen and allowShort
             if FADE
                 strategy.entry("S", strategy.short, limit=shortPx)
             else
                 strategy.entry("S", strategy.short, stop=shortPx)
-        if posNext > 0 and not (canOpen and allowShort)
+        if (posNext > 0 or (canOpen and allowLong)) and not (canOpen and allowShort)
             if FADE
                 strategy.exit("xL", from_entry="L", limit=shortPx)
             else
                 strategy.exit("xL", from_entry="L", stop=shortPx)
-        if posNext < 0 and not (canOpen and allowLong)
+        if (posNext < 0 or (canOpen and allowShort)) and not (canOpen and allowLong)
             if FADE
                 strategy.exit("xS", from_entry="S", limit=longPx)
             else

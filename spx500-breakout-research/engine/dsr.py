@@ -7,7 +7,17 @@ def daily_pct(S,F,b,al,label,fade=False,dirmode=0):
     for fb in (0,1,2):
         st,tr=X.run(S,F,b,al,label,fb=fb,reopen_mode=2,dirmode=dirmode)
         g=(tr[:,4]-tr[:,3])*tr[:,2]*(-1 if fade else 1)
-        net=g-0.5-(tr[:,5] if not fade else 0)  # fade financing approx ignored here (small)
+        if fade:  # financing of the faded (opposite) position
+            fin=np.zeros(len(tr))
+            for k,(e,x,dr,ep,xp,f) in enumerate(tr):
+                e,x=int(e),int(x)
+                for i in range(e+1,x+1):
+                    if d['nights'][i]>0:
+                        base=d['C'][i-1]*d['nights'][i]/365
+                        fin[k]+=base*(d['rate'][i]+0.025) if dr==-1 else base*(0.025-d['rate'][i])
+        else:
+            fin=tr[:,5]
+        net=g-0.5-fin
         if worst is None or net.sum()<worst[0].sum(): worst=(net,tr)
     net,tr=worst
     # mark-to-market daily % returns on a 1-unit position, financing/cost booked at exit
@@ -20,9 +30,9 @@ def daily_pct(S,F,b,al,label,fade=False,dirmode=0):
     u,inv=np.unique(day,return_inverse=True)
     dp=np.bincount(inv,pnl); px=np.bincount(inv,C)/np.bincount(inv)
     return dp/px
-def dsr(r,N):
+def dsr(r,N,vmult=1.0):
     T=len(r); sr=r.mean()/r.std(); g3=skew(r); g4=kurtosis(r,fisher=False)
-    V=1.0/T; gam=0.5772
+    V=vmult/T; gam=0.5772  # vmult: across-trial Sharpe variance as a multiple of 1/T (measured ~1.8-2.8 on this grid)
     srstar=np.sqrt(V)*((1-gam)*norm.ppf(1-1/N)+gam*norm.ppf(1-1/(N*np.e)))
     z=(sr-srstar)*np.sqrt(T-1)/np.sqrt(1-g3*sr+(g4-1)/4*sr**2)
     return float(norm.cdf(z)), float(sr*np.sqrt(252))
@@ -38,5 +48,6 @@ for name,a in C:
     r=daily_pct(*a); r=r[np.abs(r)>0] if False else r
     row=dict(name=name, sharpe_ann=round(dsr(r,2)[1],2))
     for N in (10,100,1000,10000): row[f"DSR_N{N}"]=round(dsr(r,N)[0],3)
+    for N in (100,1000): row[f"DSR_N{N}_V2x"]=round(dsr(r,N,2.0)[0],3)
     out.append(row); print(row)
 json.dump(out,open('dsr.json','w'),indent=1)
