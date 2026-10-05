@@ -1,0 +1,81 @@
+//@version=5
+strategy("A: 08:00 range break, hold to 09:00 next day", overlay=true, pyramiding=0,
+     default_qty_type=strategy.fixed, default_qty_value=1, use_bar_magnifier=true)
+
+// Strategy A (all hours UTC)
+//  - 09:00-14:00: levels = high/low of the 08:00 candle (frozen)
+//  - 15:00-08:00: levels = previous candle's high/low
+//  - The first break after 09:00 opens the trade (buy stop above / sell stop below)
+//  - The trade is held until the 09:00 candle opens next day, then a new cycle starts
+//  - Flat over the weekend; no orders on the first candle after a market break
+// Turn on the Bar Magnifier (Premium) so candles that break both levels use 1-minute data,
+// and set your spread under Properties -> Slippage/Commission.
+
+sessStart   = input.int(15, "Session starts (UTC)", minval=0, maxval=23)
+freezeHr    = input.int(8,  "Freeze hour (UTC)", minval=0, maxval=23)
+cycleHr     = input.int(9,  "Cycle hour (UTC): close and restart", minval=0, maxval=23)
+bufPct      = input.float(0, "Buffer (% of freeze candle range)", minval=0, step=1) / 100
+weekendFlat = input.bool(true, "Flat over the weekend")
+skipReopen  = input.bool(true, "No orders on the first candle after a market break")
+
+HOUR = 3600000
+inSess(h) => sessStart <= freezeHr ? (h >= sessStart and h <= freezeHr) : (h >= sessStart or h <= freezeHr)
+cycleOf(t) => math.floor((t / HOUR - cycleHr) / 24)
+
+// 1. frozen levels, set when the freeze candle closes
+var float frzH = na
+var float frzL = na
+if hour(time, "UTC") == freezeHr
+    frzH := high + bufPct * (high - low)
+    frzL := low  - bufPct * (high - low)
+
+// 2. levels for the next candle (known at this candle's close)
+tn = time_close
+nextInSess = inSess(hour(tn, "UTC"))
+nH = nextInSess ? high : frzH
+nL = nextInSess ? low  : frzL
+
+// 3. one entry per cycle
+tradesNow  = strategy.closedtrades + strategy.opentrades   // +1 for every new entry
+prevTrades = nz(tradesNow[1])
+cyc = cycleOf(time)
+var int curCyc = na
+var int tradesAtStart = 0
+if na(curCyc) or cyc != curCyc
+    curCyc := cyc
+    tradesAtStart := prevTrades
+used = tradesNow > tradesAtStart
+
+pos = strategy.position_size
+var int entryCyc = na
+if tradesNow > prevTrades and pos != 0
+    entryCyc := cyc
+
+lastOfWeek   = session.islastbar and dayofweek(time, "UTC") == dayofweek.friday
+newCycleNext = cycleOf(tn) != cyc
+
+// 4. exits
+weekEnd = weekendFlat and lastOfWeek and pos != 0
+stale   = pos != 0 and not na(entryCyc) and entryCyc != cyc   // cycle end fell inside a market break
+cycleUp = newCycleNext and pos != 0
+if weekEnd
+    strategy.close_all(comment="week end", immediately=true)          // at Friday's last close
+else if stale
+    strategy.close_all(comment="missed cycle end", immediately=true)
+else if cycleUp
+    strategy.close_all(comment="cycle end")                           // at the 09:00 open
+flatNext = weekEnd or stale or cycleUp or pos == 0
+
+// 5. entry orders for the next candle: the first break wins, the other side is cancelled
+skipNext = skipReopen and session.islastbar
+canOpen  = flatNext and (not used or newCycleNext) and not skipNext and not (weekendFlat and lastOfWeek)
+strategy.cancel("L")
+strategy.cancel("S")
+if canOpen and not na(nH) and not na(nL)
+    strategy.entry("L", strategy.long,  stop=nH, oca_name="first", oca_type=strategy.oca.cancel)
+    strategy.entry("S", strategy.short, stop=nL, oca_name="first", oca_type=strategy.oca.cancel)
+
+// 6. visuals
+plot(nH, "Upper level", color.teal,   1, plot.style_stepline, offset=1)
+plot(nL, "Lower level", color.maroon, 1, plot.style_stepline, offset=1)
+bgcolor(inSess(hour(time, "UTC")) ? na : color.new(color.blue, 92), title="Frozen 08:00 levels")
