@@ -1,0 +1,58 @@
+[
+ {
+  "name": "FADE first break, R=06 hold 24h",
+  "sharpe_ann": 1.1,
+  "DSR_N10": 0.961,
+  "DSR_N100": 0.777,
+  "DSR_N1000": 0.503,
+  "DSR_N10000": 0.267
+ },
+ {
+  "name": "08:00-range break after 09:00, hold to 09:00",
+  "sharpe_ann": 0.75,
+  "DSR_N10": 0.735,
+  "DSR_N100": 0.384,
+  "DSR_N1000": 0.16,
+  "DSR_N10000": 0.057
+ },
+ {
+  "name": "same, LONG-ONLY",
+  "sharpe_ann": 0.61,
+  "DSR_N10": 0.596,
+  "DSR_N100": 0.238,
+  "DSR_N1000": 0.075,
+  "DSR_N10000": 0.02
+ },
+ {
+  "name": "15:00 entry only, hold 24h",
+  "sharpe_ann": 0.67,
+  "DSR_N10": 0.661,
+  "DSR_N100": 0.291,
+  "DSR_N1000": 0.1,
+  "DSR_N10000": 0.029
+ },
+ {
+  "name": "weekly: first break from Mon 10:00, hold to Fri",
+  "sharpe_ann": 1.01,
+  "DSR_N10": 0.927,
+  "DSR_N100": 0.682,
+  "DSR_N1000": 0.394,
+  "DSR_N10000": 0.188
+ },
+ {
+  "name": "10:00 entry, hold 120h",
+  "sharpe_ann": 1.05,
+  "DSR_N10": 0.945,
+  "DSR_N100": 0.729,
+  "DSR_N1000": 0.446,
+  "DSR_N10000": 0.224
+ },
+ {
+  "name": "ORIGINAL Pine (13-20, freeze 20:00), always in",
+  "sharpe_ann": -3.5,
+  "DSR_N10": 0.0,
+  "DSR_N100": 0.0,
+  "DSR_N1000": 0.0,
+  "DSR_N10000": 0.0
+ }
+]
