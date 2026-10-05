@@ -113,7 +113,7 @@ class TP:
         d = self.d
         tm = np.ones(12, np.bool_) if tp_months is None else np.asarray(tp_months, np.bool_)
         trm = np.ones(12, np.bool_) if trade_months is None else np.asarray(trade_months, np.bool_)
-        out = np.zeros((5000, 8))
+        out = np.zeros((len(d["O"]), 8))  # at most one trade per candle
         k = simulate_tp(d["O"], d["H"], d["L"], d["C"], d["hr"], d["eh"], self.mon, d["reopen"], d["nights"], d["rate"],
                         S, F, b, R, fb, tp_kind, tp_val, tm, trm, E2.MK / 100, out)
         return out[:k]
