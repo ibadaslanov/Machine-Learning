@@ -1,0 +1,236 @@
+//@version=5
+strategy("Session + Frozen Breakout: cycle strategy", overlay=true, pyramiding=0,
+     default_qty_type=strategy.fixed, default_qty_value=1, use_bar_magnifier=true,
+     process_orders_on_close=false, max_labels_count=500)
+
+// ============================================================================
+// Strategy version of "Session + Frozen 20:00 Breakout v2", with the holding-period
+// variants that were backtested in spx500-breakout-research (hourly SPX500, UTC hours).
+//
+// LEVELS (unchanged from the indicator)
+//   in session (start..end hour, UTC): previous candle high/low (+buffer if "Always")
+//   outside session: frozen high/low of the end-hour candle +/- buffer * its range
+//
+// HOW ORDERS WORK
+//   Levels for the next candle are known when the current candle closes, so they are
+//   sent as real stop orders (limit orders when fading). TradingView fills them inside
+//   the candle; turn on the Bar Magnifier (Premium) so candles that break both levels
+//   are resolved with lower-timeframe data.
+//
+// HOLDING PERIOD
+//   Always in market : stop-and-reverse forever (the original indicator)
+//   Daily cycle      : a new cycle starts every day at "Cycle hour"; any open trade is
+//                      closed at that hour's open ("from one hour to the same hour next day")
+//   Weekly cycle     : trading starts on "Week starts on" at "Cycle hour" and runs until the
+//                      last candle of the week ("start on one day and continue until the week is over")
+//   Fixed hours      : every trade is closed "Hold hours" after it was opened
+//   A cycle/week end that falls inside a market break (or a holiday Friday) can't be seen in
+//   advance; the trade is then closed at the close of the first candle after the break.
+//
+// ENTRY RULE
+//   Stop and reverse : every break flips the position (original)
+//   First break, hold: the first break of the cycle opens the trade, held to the cycle end
+//   First break, stop: as above, but a break of the opposite level closes it flat
+//
+// PRESETS fill in every input; choose "Custom" to use your own values.
+// ============================================================================
+
+preset = input.string("Custom", "Preset", options=["Custom",
+     "Original indicator (always in)",
+     "A: 08:00 range break, hold to 09:00",
+     "B: Fade first break, hold to 06:00",
+     "C: Enter 15:00 only, hold 24h",
+     "D: Weekly, first break from Mon 10:00",
+     "E: Enter 10:00 only, hold 120h"])
+
+grpL = "Levels (same as the indicator)"
+iS   = input.int(13, "Session starts (UTC hour)", minval=0, maxval=23, group=grpL)
+iF   = input.int(20, "Session ends / freeze hour (UTC)", minval=0, maxval=23, group=grpL)
+iB   = input.float(11, "Buffer (% of reference candle's high-to-low)", minval=0, step=1, group=grpL)
+iAp  = input.string("Overnight only", "Apply buffer to", options=["Overnight only", "Always"], group=grpL)
+
+grpT = "Holding period and entries"
+iMode  = input.string("Always in market", "Holding period", options=["Always in market", "Daily cycle", "Weekly cycle", "Fixed hours"], group=grpT)
+iR     = input.int(9, "Cycle hour (UTC): daily reset / weekly start", minval=0, maxval=23, group=grpT)
+iWD    = input.string("Monday", "Week starts on", options=["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"], group=grpT)
+iN     = input.int(24, "Hold hours (Fixed hours mode)", minval=1, group=grpT)
+iEnt   = input.string("Stop and reverse", "Entry rule", options=["Stop and reverse", "First break, hold", "First break, stop"], group=grpT)
+iWS    = input.int(0, "Entries allowed from (UTC hour)", minval=0, maxval=23, group=grpT)
+iWL    = input.int(24, "...for this many hours (24 = any hour)", minval=1, maxval=24, group=grpT)
+iDir   = input.string("Both", "Direction", options=["Both", "Long only", "Short only"], group=grpT)
+iFade  = input.bool(false, "Fade the break (sell the up-break, buy the down-break)", group=grpT)
+iWF    = input.bool(true, "Flat over the weekend (close Friday's last candle)", group=grpT)
+iSkip  = input.bool(true, "No orders on the first candle after a market break", group=grpT)
+
+// ---------- effective settings (preset or custom) ----------
+S    = iS,  F = iF,  B = iB / 100, AP = iAp
+MODE = iMode, R = iR, WD = iWD, N = iN, ENT = iEnt, WS = iWS, WL = iWL, DIR = iDir, FADE = iFade, WF = iWF
+switch preset
+    "Original indicator (always in)" =>
+        S := 13, F := 20, B := 0.11, AP := "Overnight only", MODE := "Always in market", ENT := "Stop and reverse", WS := 0, WL := 24, DIR := "Both", FADE := false, WF := false
+    "A: 08:00 range break, hold to 09:00" =>
+        S := 15, F := 8, B := 0.0, AP := "Overnight only", MODE := "Daily cycle", R := 9, ENT := "First break, hold", WS := 9, WL := 24, DIR := "Both", FADE := false, WF := true
+    "B: Fade first break, hold to 06:00" =>
+        S := 8, F := 18, B := 0.30, AP := "Overnight only", MODE := "Daily cycle", R := 6, ENT := "First break, hold", WS := 6, WL := 24, DIR := "Both", FADE := true, WF := true
+    "C: Enter 15:00 only, hold 24h" =>
+        S := 0, F := 12, B := 0.30, AP := "Overnight only", MODE := "Fixed hours", N := 24, ENT := "First break, hold", WS := 15, WL := 1, DIR := "Both", FADE := false, WF := true
+    "D: Weekly, first break from Mon 10:00" =>
+        S := 0, F := 8, B := 0.30, AP := "Always", MODE := "Weekly cycle", R := 10, WD := "Monday", ENT := "First break, hold", WS := 0, WL := 24, DIR := "Both", FADE := false, WF := true
+    "E: Enter 10:00 only, hold 120h" =>
+        S := 0, F := 8, B := 0.30, AP := "Overnight only", MODE := "Fixed hours", N := 120, ENT := "First break, hold", WS := 10, WL := 1, DIR := "Both", FADE := false, WF := true
+
+// ---------- helpers ----------
+HOUR_MS = 3600000
+inSess(h) => S <= F ? (h >= S and h <= F) : (h >= S or h <= F)
+// 0 = Sunday ... 5 = Friday, as in the backtest (week runs from Saturday 00:00 UTC)
+wdIdx(t) =>
+    d = dayofweek(t, "UTC")
+    d == dayofweek.sunday ? 0 : d == dayofweek.monday ? 1 : d == dayofweek.tuesday ? 2 : d == dayofweek.wednesday ? 3 : d == dayofweek.thursday ? 4 : d == dayofweek.friday ? 5 : 6
+startIdx = WD == "Monday" ? 1 : WD == "Tuesday" ? 2 : WD == "Wednesday" ? 3 : WD == "Thursday" ? 4 : 5
+weekPos(t) => wdIdx(t) == 6 ? -1 : wdIdx(t) * 24 + hour(t, "UTC")        // hours since Sunday 00:00
+dayCycle(t) => math.floor((t / HOUR_MS - R) / 24)
+weekId(t) => math.floor((t / HOUR_MS - 48) / 168)                          // epoch hour 48 = Sat 00:00 UTC
+
+// ---------- 1. frozen levels (update after the freeze candle) ----------
+var float frzH = na
+var float frzL = na
+h = hour(time, "UTC")
+if h == F
+    frzH := high + B * (high - low)
+    frzL := low  - B * (high - low)
+
+// ---------- 2. levels for the NEXT candle (known now) ----------
+tn = time_close                     // start of the next candle (nominal)
+hn = hour(tn, "UTC")
+float nH = na
+float nL = na
+if inSess(hn)
+    bb = AP == "Always" ? B * (high - low) : 0.0
+    nH := high + bb
+    nL := low  - bb
+else
+    nH := frzH
+    nL := frzL
+
+// ---------- 3. cycle bookkeeping ----------
+// The cycle a candle belongs to is computed from its own time, so a cycle that starts after
+// a weekend or daily break is recognised on its first candle. Any entry since the cycle began
+// uses up the "first break" of that cycle.
+cycId     = MODE == "Daily cycle" ? dayCycle(time) : MODE == "Weekly cycle" ? weekId(time) : 0
+tradesNow = strategy.closedtrades + strategy.opentrades   // +1 for every new entry (a reversal counts too)
+prevTrades = nz(tradesNow[1])
+var int curCyc = na
+var int tradesAtCycleStart = 0
+if na(curCyc) or cycId != curCyc
+    curCyc := cycId
+    tradesAtCycleStart := prevTrades
+done = tradesNow > tradesAtCycleStart
+
+// the open trade's entry candle (its open time, like the backtest's entry hour; with the Bar Magnifier
+// strategy.opentrades.entry_time can be an intrabar time) and the cycle / week it was opened in
+pos = strategy.position_size
+wkNow = weekId(time)
+var int entryBarTime = na
+var int entryCyc     = na
+var int entryWeek    = na
+if tradesNow > prevTrades and pos != 0
+    entryBarTime := time
+    entryCyc     := cycId
+    entryWeek    := wkNow
+
+lastOfWeek   = session.islastbar and dayofweek(time, "UTC") == dayofweek.friday
+newCycleNext = MODE == "Daily cycle" ? dayCycle(tn) != dayCycle(time) : MODE == "Weekly cycle" ? weekId(tn) != wkNow : false
+
+// ---------- 4. forced exits ----------
+bool weekEndNow = (WF or MODE == "Weekly cycle") and lastOfWeek and pos != 0
+// a cycle or week end that fell inside a market break (boundary hour missing, holiday Friday, early close
+// that session.islastbar doesn't flag): the trade is still open in a later cycle/week, so close it now
+bool stale      = pos != 0 and not na(entryCyc) and (((MODE == "Daily cycle" or MODE == "Weekly cycle") and entryCyc != cycId) or ((WF or MODE == "Weekly cycle") and entryWeek != wkNow))
+bool timeUp     = MODE == "Fixed hours" and pos != 0 and not na(entryBarTime) and tn - entryBarTime >= N * HOUR_MS
+bool cycleUp    = newCycleNext and pos != 0
+if weekEndNow
+    strategy.close_all(comment="week end", immediately=true)      // filled at this candle's close
+else if stale
+    strategy.close_all(comment="missed cycle end", immediately=true)  // filled at this candle's close
+else if cycleUp
+    strategy.close_all(comment="cycle end")                       // filled at the next candle's open
+else if timeUp
+    strategy.close_all(comment=str.tostring(N) + "h exit")        // filled at the next candle's open
+// position as it will be when the next candle's orders become active
+posNext = (weekEndNow or stale or cycleUp or timeUp) ? 0.0 : pos
+
+// ---------- 5. may the next candle open a trade? ----------
+activeNext = MODE != "Weekly cycle" or (weekPos(tn) >= startIdx * 24 + R)
+windowNext = ((hn - WS) % 24 + 24) % 24 < WL
+skipNext   = iSkip and session.islastbar          // next candle is the first after a market break
+holding    = ENT != "Stop and reverse"
+// in daily/weekly cycles a new cycle next candle frees the first break again
+firstUsed  = holding and (MODE == "Daily cycle" or MODE == "Weekly cycle") and done and not newCycleNext
+canOpen    = activeNext and windowNext and not skipNext and not firstUsed and not (WF and lastOfWeek)
+allowLong  = DIR != "Short only"
+allowShort = DIR != "Long only"
+
+// prices: breakout = stop orders at the levels; fade = limit orders at the levels
+longPx  = FADE ? nL : nH
+shortPx = FADE ? nH : nL
+
+strategy.cancel("L")
+strategy.cancel("S")
+strategy.cancel("xL")
+strategy.cancel("xS")
+
+if not na(nH) and not na(nL) and not skipNext
+    if not holding
+        // stop and reverse: both sides every candle, whatever the position, so a candle that breaks
+        // both levels reverses twice like the backtest (pyramiding=0 rejects the side already held);
+        // a side we may not open just closes (also a position opened earlier in the same candle)
+        if canOpen and allowLong
+            if FADE
+                strategy.entry("L", strategy.long, limit=longPx)
+            else
+                strategy.entry("L", strategy.long, stop=longPx)
+        if canOpen and allowShort
+            if FADE
+                strategy.entry("S", strategy.short, limit=shortPx)
+            else
+                strategy.entry("S", strategy.short, stop=shortPx)
+        if (posNext > 0 or (canOpen and allowLong)) and not (canOpen and allowShort)
+            if FADE
+                strategy.exit("xL", from_entry="L", limit=shortPx)
+            else
+                strategy.exit("xL", from_entry="L", stop=shortPx)
+        if (posNext < 0 or (canOpen and allowShort)) and not (canOpen and allowLong)
+            if FADE
+                strategy.exit("xS", from_entry="S", limit=longPx)
+            else
+                strategy.exit("xS", from_entry="S", stop=longPx)
+    else
+        // first break: one entry; the other side is cancelled when it fills
+        if posNext == 0 and canOpen
+            if allowLong
+                if FADE
+                    strategy.entry("L", strategy.long, limit=longPx, oca_name="first", oca_type=strategy.oca.cancel)
+                else
+                    strategy.entry("L", strategy.long, stop=longPx, oca_name="first", oca_type=strategy.oca.cancel)
+            if allowShort
+                if FADE
+                    strategy.entry("S", strategy.short, limit=shortPx, oca_name="first", oca_type=strategy.oca.cancel)
+                else
+                    strategy.entry("S", strategy.short, stop=shortPx, oca_name="first", oca_type=strategy.oca.cancel)
+        // "First break, stop": a break of the opposite level closes the trade
+        // (placed before the entry fills too, so a same-candle double break stops out like the backtest)
+        if ENT == "First break, stop" and posNext >= 0
+            if FADE
+                strategy.exit("xL", from_entry="L", limit=shortPx)
+            else
+                strategy.exit("xL", from_entry="L", stop=shortPx)
+        if ENT == "First break, stop" and posNext <= 0
+            if FADE
+                strategy.exit("xS", from_entry="S", limit=longPx)
+            else
+                strategy.exit("xS", from_entry="S", stop=longPx)
+
+// ---------- 6. visuals ----------
+plot(nH, "Next upper level", color.new(color.teal, 0), 1, plot.style_stepline, offset=1)
+plot(nL, "Next lower level", color.new(color.maroon, 0), 1, plot.style_stepline, offset=1)
+bgcolor(inSess(h) ? na : color.new(color.blue, 92), title="Frozen-level hours")

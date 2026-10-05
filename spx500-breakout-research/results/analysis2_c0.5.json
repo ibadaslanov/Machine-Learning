@@ -1,0 +1,4111 @@
+{
+ "cost": 0.5,
+ "eligible": 2455293,
+ "normal_share_pos_IS": 0.25675347097067436,
+ "normal_share_pos_OOS": 0.30543360812742104,
+ "normal_share_pos_both": 0.11559720163744205,
+ "normal_spearman": 0.5020495514923352,
+ "fade_share_pos_IS": 0.1380291476414424,
+ "fade_share_pos_OOS": 0.15382278204678626,
+ "fade_share_pos_both": 0.05001032463335333,
+ "fade_spearman": 0.552082611921201,
+ "families": {
+  "CONT": {
+   "n": 2112,
+   "med_IS": -12465,
+   "med_OOS": -10210,
+   "share_OOS_pos": 0.0,
+   "spearman": 0.905,
+   "best": {
+    "strategy": "S=15 F=15 buf 30% always | CONT | SAR",
+    "IS": -2825,
+    "OOS": -3766,
+    "trades_IS": 1336,
+    "trades_OOS": 1040,
+    "fin_total": 883,
+    "by_year_worst_fb": {
+     "2019": -533,
+     "2020": -1907,
+     "2021": -653,
+     "2022": 268,
+     "2023": -814,
+     "2024": -855,
+     "2025": -1494,
+     "2026": -602
+    },
+    "ddIS": 3391,
+    "ddOOS": 3822
+   },
+   "fade_med_OOS": -4887,
+   "fade_best": {
+    "strategy": "FADE S=13 F=19 buf 30% always | CONT | SAR",
+    "IS": 1063,
+    "OOS": -2436,
+    "trades_IS": 2887,
+    "trades_OOS": 2165,
+    "fin_total": 782,
+    "by_year_worst_fb": {
+     "2019": -335,
+     "2020": 1787,
+     "2021": -226,
+     "2022": 108,
+     "2023": 102,
+     "2024": -813,
+     "2025": -1646,
+     "2026": 254
+    },
+    "ddIS": 9062,
+    "ddOOS": 3725
+   }
+  },
+  "CONT_WF": {
+   "n": 2112,
+   "med_IS": -12246,
+   "med_OOS": -10172,
+   "share_OOS_pos": 0.0,
+   "spearman": 0.91,
+   "best": {
+    "strategy": "S=14 F=14 buf 30% always | CONT_WF | SAR",
+    "IS": -2615,
+    "OOS": -1513,
+    "trades_IS": 1485,
+    "trades_OOS": 1138,
+    "fin_total": 527,
+    "by_year_worst_fb": {
+     "2019": -319,
+     "2020": -1662,
+     "2021": -383,
+     "2022": -250,
+     "2023": -431,
+     "2024": -449,
+     "2025": -771,
+     "2026": 97
+    },
+    "ddIS": 2935,
+    "ddOOS": 1923
+   },
+   "fade_med_OOS": -4767,
+   "fade_best": {
+    "strategy": "FADE S=13 F=19 buf 30% always | CONT_WF | SAR",
+    "IS": 1014,
+    "OOS": -2146,
+    "trades_IS": 3021,
+    "trades_OOS": 2265,
+    "fin_total": 506,
+    "by_year_worst_fb": {
+     "2019": -283,
+     "2020": 1551,
+     "2021": -208,
+     "2022": 76,
+     "2023": 70,
+     "2024": -817,
+     "2025": -1570,
+     "2026": 317
+    },
+    "ddIS": 8693,
+    "ddOOS": 3819
+   }
+  },
+  "DAY | HOLD | any hour": {
+   "n": 50688,
+   "med_IS": -475,
+   "med_OOS": -861,
+   "share_OOS_pos": 0.277,
+   "spearman": 0.486,
+   "best": {
+    "strategy": "S=23 F=19 buf 11% overnight | DAY R=22 WF | HOLD | entries any hour",
+    "IS": 3934,
+    "OOS": 701,
+    "trades_IS": 1035,
+    "trades_OOS": 819,
+    "fin_total": 520,
+    "by_year_worst_fb": {
+     "2019": -334,
+     "2020": 1021,
+     "2021": 310,
+     "2022": 2621,
+     "2023": -536,
+     "2024": 881,
+     "2025": 26,
+     "2026": 229
+    },
+    "ddIS": 633,
+    "ddOOS": 1017
+   },
+   "fade_med_OOS": -943,
+   "fade_best": {
+    "strategy": "FADE S=08 F=18 buf 30% overnight | DAY R=06 WF | HOLD | entries any hour",
+    "IS": 4552,
+    "OOS": 2102,
+    "trades_IS": 1230,
+    "trades_OOS": 952,
+    "fin_total": 558,
+    "by_year_worst_fb": {
+     "2019": -33,
+     "2020": 1471,
+     "2021": 335,
+     "2022": 2914,
+     "2023": -195,
+     "2024": -467,
+     "2025": 2456,
+     "2026": 406
+    },
+    "ddIS": 6582,
+    "ddOOS": 4097
+   }
+  },
+  "DAY | HOLD | window 1h": {
+   "n": 50259,
+   "med_IS": -631,
+   "med_OOS": -762,
+   "share_OOS_pos": 0.252,
+   "spearman": 0.393,
+   "best": {
+    "strategy": "S=00 F=12 buf 30% overnight | DAY R=15 WF | HOLD | entries 15:00+1h",
+    "IS": 2515,
+    "OOS": 1161,
+    "trades_IS": 936,
+    "trades_OOS": 746,
+    "fin_total": 481,
+    "by_year_worst_fb": {
+     "2019": -465,
+     "2020": 1038,
+     "2021": 488,
+     "2022": 1420,
+     "2023": 345,
+     "2024": -470,
+     "2025": 959,
+     "2026": 312
+    },
+    "ddIS": 766,
+    "ddOOS": 895
+   },
+   "fade_med_OOS": -411,
+   "fade_best": {
+    "strategy": "FADE S=09 F=17 buf 30% overnight | DAY R=08 WF | HOLD | entries 08:00+1h",
+    "IS": 3685,
+    "OOS": 1952,
+    "trades_IS": 846,
+    "trades_OOS": 604,
+    "fin_total": 449,
+    "by_year_worst_fb": {
+     "2019": -224,
+     "2020": 2202,
+     "2021": 822,
+     "2022": 1055,
+     "2023": -215,
+     "2024": -98,
+     "2025": 2020,
+     "2026": 384
+    },
+    "ddIS": 5150,
+    "ddOOS": 3298
+   }
+  },
+  "DAY | HOLD | window 4h": {
+   "n": 50688,
+   "med_IS": -678,
+   "med_OOS": -956,
+   "share_OOS_pos": 0.254,
+   "spearman": 0.425,
+   "best": {
+    "strategy": "S=23 F=19 buf 11% overnight | DAY R=22 WF | HOLD | entries 22:00+4h",
+    "IS": 3904,
+    "OOS": 825,
+    "trades_IS": 1025,
+    "trades_OOS": 812,
+    "fin_total": 516,
+    "by_year_worst_fb": {
+     "2019": -333,
+     "2020": 929,
+     "2021": 309,
+     "2022": 2684,
+     "2023": -572,
+     "2024": 869,
+     "2025": 198,
+     "2026": 229
+    },
+    "ddIS": 633,
+    "ddOOS": 1017
+   },
+   "fade_med_OOS": -561,
+   "fade_best": {
+    "strategy": "FADE S=08 F=18 buf 30% overnight | DAY R=06 WF | HOLD | entries 06:00+4h",
+    "IS": 4503,
+    "OOS": 2581,
+    "trades_IS": 1031,
+    "trades_OOS": 815,
+    "fin_total": 558,
+    "by_year_worst_fb": {
+     "2019": 25,
+     "2020": 1383,
+     "2021": 301,
+     "2022": 2926,
+     "2023": -39,
+     "2024": -359,
+     "2025": 2636,
+     "2026": 439
+    },
+    "ddIS": 6263,
+    "ddOOS": 4375
+   }
+  },
+  "DAY | SAR | any hour": {
+   "n": 50688,
+   "med_IS": -12091,
+   "med_OOS": -9989,
+   "share_OOS_pos": 0.0,
+   "spearman": 0.907,
+   "best": {
+    "strategy": "S=14 F=14 buf 30% overnight | DAY R=14 WF | SAR | entries any hour",
+    "IS": -1325,
+    "OOS": -684,
+    "trades_IS": 2229,
+    "trades_OOS": 1741,
+    "fin_total": 526,
+    "by_year_worst_fb": {
+     "2019": -271,
+     "2020": -1427,
+     "2021": -62,
+     "2022": 435,
+     "2023": -496,
+     "2024": 224,
+     "2025": -30,
+     "2026": -381
+    },
+    "ddIS": 2042,
+    "ddOOS": 1279
+   },
+   "fade_med_OOS": -5081,
+   "fade_best": {
+    "strategy": "FADE S=13 F=19 buf 30% always | DAY R=23 WF | SAR | entries any hour",
+    "IS": 1526,
+    "OOS": -2841,
+    "trades_IS": 3597,
+    "trades_OOS": 2700,
+    "fin_total": 506,
+    "by_year_worst_fb": {
+     "2019": -294,
+     "2020": 1746,
+     "2021": -71,
+     "2022": 274,
+     "2023": -107,
+     "2024": -998,
+     "2025": -1715,
+     "2026": 205
+    },
+    "ddIS": 8932,
+    "ddOOS": 3627
+   }
+  },
+  "DAY | SAR | window 1h": {
+   "n": 50259,
+   "med_IS": -282,
+   "med_OOS": -174,
+   "share_OOS_pos": 0.355,
+   "spearman": 0.12,
+   "best": {
+    "strategy": "S=20 F=08 no buffer | DAY R=12 WF | SAR | entries 12:00+1h",
+    "IS": 1386,
+    "OOS": -1157,
+    "trades_IS": 986,
+    "trades_OOS": 854,
+    "fin_total": 135,
+    "by_year_worst_fb": {
+     "2019": 268,
+     "2020": -89,
+     "2021": 530,
+     "2022": 677,
+     "2023": -378,
+     "2024": -111,
+     "2025": -812,
+     "2026": 144
+    },
+    "ddIS": 453,
+    "ddOOS": 1400
+   },
+   "fade_med_OOS": -642,
+   "fade_best": {
+    "strategy": "FADE S=14 F=18 buf 30% always | DAY R=06 WF | SAR | entries 06:00+1h",
+    "IS": 1486,
+    "OOS": 738,
+    "trades_IS": 769,
+    "trades_OOS": 524,
+    "fin_total": 41,
+    "by_year_worst_fb": {
+     "2019": -152,
+     "2020": 637,
+     "2021": 188,
+     "2022": 823,
+     "2023": -5,
+     "2024": -8,
+     "2025": 472,
+     "2026": 286
+    },
+    "ddIS": 2359,
+    "ddOOS": 1476
+   }
+  },
+  "DAY | SAR | window 4h": {
+   "n": 50688,
+   "med_IS": -1513,
+   "med_OOS": -1244,
+   "share_OOS_pos": 0.063,
+   "spearman": 0.681,
+   "best": {
+    "strategy": "S=04 F=08 no buffer | DAY R=08 WF | SAR | entries 08:00+4h",
+    "IS": 1430,
+    "OOS": -1467,
+    "trades_IS": 1720,
+    "trades_OOS": 1399,
+    "fin_total": 174,
+    "by_year_worst_fb": {
+     "2019": -28,
+     "2020": -120,
+     "2021": 385,
+     "2022": 1193,
+     "2023": -528,
+     "2024": -218,
+     "2025": -787,
+     "2026": 66
+    },
+    "ddIS": 593,
+    "ddOOS": 1644
+   },
+   "fade_med_OOS": -1307,
+   "fade_best": {
+    "strategy": "FADE S=14 F=18 buf 30% always | DAY R=04 WF | SAR | entries 04:00+4h",
+    "IS": 1537,
+    "OOS": 753,
+    "trades_IS": 925,
+    "trades_OOS": 627,
+    "fin_total": 44,
+    "by_year_worst_fb": {
+     "2019": -404,
+     "2020": 756,
+     "2021": 33,
+     "2022": 1162,
+     "2023": 46,
+     "2024": -26,
+     "2025": 539,
+     "2026": 203
+    },
+    "ddIS": 2816,
+    "ddOOS": 1592
+   }
+  },
+  "DAY | STOP | any hour": {
+   "n": 50688,
+   "med_IS": -133,
+   "med_OOS": 25,
+   "share_OOS_pos": 0.519,
+   "spearman": 0.247,
+   "best": {
+    "strategy": "S=08 F=08 no buffer | DAY R=11 WF | STOP | entries any hour",
+    "IS": 1805,
+    "OOS": -515,
+    "trades_IS": 1244,
+    "trades_OOS": 988,
+    "fin_total": 193,
+    "by_year_worst_fb": {
+     "2019": 37,
+     "2020": 75,
+     "2021": 550,
+     "2022": 1143,
+     "2023": -306,
+     "2024": -276,
+     "2025": 38,
+     "2026": 29
+    },
+    "ddIS": 531,
+    "ddOOS": 699
+   },
+   "fade_med_OOS": -1071,
+   "fade_best": {
+    "strategy": "FADE S=14 F=18 buf 30% always | DAY R=06 WF | STOP | entries any hour",
+    "IS": 1409,
+    "OOS": 842,
+    "trades_IS": 1230,
+    "trades_OOS": 951,
+    "fin_total": 63,
+    "by_year_worst_fb": {
+     "2019": -448,
+     "2020": 1040,
+     "2021": -102,
+     "2022": 935,
+     "2023": -231,
+     "2024": -112,
+     "2025": 716,
+     "2026": 481
+    },
+    "ddIS": 2895,
+    "ddOOS": 2114
+   }
+  },
+  "DAY | STOP | window 1h": {
+   "n": 50259,
+   "med_IS": -151,
+   "med_OOS": -52,
+   "share_OOS_pos": 0.451,
+   "spearman": 0.146,
+   "best": {
+    "strategy": "S=04 F=08 no buffer | DAY R=11 WF | STOP | entries 11:00+1h",
+    "IS": 1403,
+    "OOS": -544,
+    "trades_IS": 876,
+    "trades_OOS": 710,
+    "fin_total": 158,
+    "by_year_worst_fb": {
+     "2019": 2,
+     "2020": 6,
+     "2021": 612,
+     "2022": 782,
+     "2023": -307,
+     "2024": 20,
+     "2025": -307,
+     "2026": 50
+    },
+    "ddIS": 496,
+    "ddOOS": 723
+   },
+   "fade_med_OOS": -669,
+   "fade_best": {
+    "strategy": "FADE S=14 F=18 buf 30% always | DAY R=06 WF | STOP | entries 06:00+1h",
+    "IS": 1451,
+    "OOS": 729,
+    "trades_IS": 766,
+    "trades_OOS": 523,
+    "fin_total": 40,
+    "by_year_worst_fb": {
+     "2019": -152,
+     "2020": 603,
+     "2021": 188,
+     "2022": 823,
+     "2023": -5,
+     "2024": -8,
+     "2025": 463,
+     "2026": 286
+    },
+    "ddIS": 2321,
+    "ddOOS": 1465
+   }
+  },
+  "DAY | STOP | window 4h": {
+   "n": 50688,
+   "med_IS": -180,
+   "med_OOS": -52,
+   "share_OOS_pos": 0.461,
+   "spearman": 0.221,
+   "best": {
+    "strategy": "S=05 F=08 no buffer | DAY R=11 WF | STOP | entries 11:00+4h",
+    "IS": 1864,
+    "OOS": -653,
+    "trades_IS": 1030,
+    "trades_OOS": 814,
+    "fin_total": 191,
+    "by_year_worst_fb": {
+     "2019": 80,
+     "2020": -137,
+     "2021": 718,
+     "2022": 1204,
+     "2023": -231,
+     "2024": -97,
+     "2025": -511,
+     "2026": 187
+    },
+    "ddIS": 556,
+    "ddOOS": 903
+   },
+   "fade_med_OOS": -818,
+   "fade_best": {
+    "strategy": "FADE S=15 F=15 buf 30% overnight | DAY R=05 WF | STOP | entries 05:00+4h",
+    "IS": 1578,
+    "OOS": -42,
+    "trades_IS": 855,
+    "trades_OOS": 628,
+    "fin_total": 130,
+    "by_year_worst_fb": {
+     "2019": -183,
+     "2020": 1111,
+     "2021": 300,
+     "2022": 388,
+     "2023": -76,
+     "2024": -307,
+     "2025": 302,
+     "2026": 51
+    },
+    "ddIS": 2762,
+    "ddOOS": 1080
+   }
+  },
+  "TIME 120h | HOLD | 1-hour window": {
+   "n": 46693,
+   "med_IS": -156,
+   "med_OOS": -457,
+   "share_OOS_pos": 0.39,
+   "spearman": 0.247,
+   "best": {
+    "strategy": "S=00 F=08 buf 30% overnight | TIME 120h WF | HOLD | entries 10:00 only",
+    "IS": 3709,
+    "OOS": 1049,
+    "trades_IS": 201,
+    "trades_OOS": 162,
+    "fin_total": 416,
+    "by_year_worst_fb": {
+     "2019": 102,
+     "2020": 2229,
+     "2021": 77,
+     "2022": 1301,
+     "2023": 991,
+     "2024": 43,
+     "2025": 27,
+     "2026": -11
+    },
+    "ddIS": 1122,
+    "ddOOS": 859
+   },
+   "fade_med_OOS": -497,
+   "fade_best": {
+    "strategy": "FADE S=00 F=13 no buffer | TIME 120h WF | HOLD | entries 19:00 only",
+    "IS": 2535,
+    "OOS": -391,
+    "trades_IS": 209,
+    "trades_OOS": 165,
+    "fin_total": 557,
+    "by_year_worst_fb": {
+     "2019": 303,
+     "2020": 936,
+     "2021": 651,
+     "2022": 857,
+     "2023": 117,
+     "2024": -252,
+     "2025": -314,
+     "2026": 229
+    },
+    "ddIS": 3685,
+    "ddOOS": 1097
+   }
+  },
+  "TIME 120h | HOLD | any hour": {
+   "n": 2112,
+   "med_IS": 591,
+   "med_OOS": -503,
+   "share_OOS_pos": 0.385,
+   "spearman": 0.855,
+   "best": {
+    "strategy": "S=01 F=23 buf 30% overnight | TIME 120h WF | HOLD | entries any hour",
+    "IS": 2412,
+    "OOS": 1246,
+    "trades_IS": 209,
+    "trades_OOS": 165,
+    "fin_total": 514,
+    "by_year_worst_fb": {
+     "2019": 510,
+     "2020": 975,
+     "2021": -1091,
+     "2022": 1956,
+     "2023": -542,
+     "2024": 680,
+     "2025": 906,
+     "2026": 202
+    },
+    "ddIS": 1259,
+    "ddOOS": 815
+   },
+   "fade_med_OOS": -361,
+   "fade_best": {
+    "strategy": "FADE S=07 F=14 buf 30% overnight | TIME 120h WF | HOLD | entries any hour",
+    "IS": 1921,
+    "OOS": 128,
+    "trades_IS": 209,
+    "trades_OOS": 165,
+    "fin_total": 595,
+    "by_year_worst_fb": {
+     "2019": -127,
+     "2020": 393,
+     "2021": 1112,
+     "2022": 754,
+     "2023": -761,
+     "2024": 866,
+     "2025": 201,
+     "2026": 5
+    },
+    "ddIS": 2934,
+    "ddOOS": 2621
+   }
+  },
+  "TIME 120h | SAR | 1-hour window": {
+   "n": 50259,
+   "med_IS": -282,
+   "med_OOS": -181,
+   "share_OOS_pos": 0.351,
+   "spearman": 0.117,
+   "best": {
+    "strategy": "S=20 F=08 no buffer | TIME 120h WF | SAR | entries 12:00 only",
+    "IS": 1373,
+    "OOS": -1154,
+    "trades_IS": 986,
+    "trades_OOS": 854,
+    "fin_total": 135,
+    "by_year_worst_fb": {
+     "2019": 268,
+     "2020": -89,
+     "2021": 517,
+     "2022": 677,
+     "2023": -378,
+     "2024": -114,
+     "2025": -806,
+     "2026": 144
+    },
+    "ddIS": 457,
+    "ddOOS": 1397
+   },
+   "fade_med_OOS": -639,
+   "fade_best": {
+    "strategy": "FADE S=14 F=18 buf 30% always | TIME 120h WF | SAR | entries 06:00 only",
+    "IS": 1553,
+    "OOS": 691,
+    "trades_IS": 745,
+    "trades_OOS": 503,
+    "fin_total": 42,
+    "by_year_worst_fb": {
+     "2019": -114,
+     "2020": 652,
+     "2021": 201,
+     "2022": 824,
+     "2023": -62,
+     "2024": -30,
+     "2025": 503,
+     "2026": 287
+    },
+    "ddIS": 2400,
+    "ddOOS": 1428
+   }
+  },
+  "TIME 120h | SAR | any hour": {
+   "n": 2112,
+   "med_IS": -12246,
+   "med_OOS": -10172,
+   "share_OOS_pos": 0.0,
+   "spearman": 0.91,
+   "best": {
+    "strategy": "S=14 F=14 buf 30% always | TIME 120h WF | SAR | entries any hour",
+    "IS": -2615,
+    "OOS": -1513,
+    "trades_IS": 1485,
+    "trades_OOS": 1138,
+    "fin_total": 527,
+    "by_year_worst_fb": {
+     "2019": -319,
+     "2020": -1662,
+     "2021": -383,
+     "2022": -250,
+     "2023": -431,
+     "2024": -449,
+     "2025": -771,
+     "2026": 97
+    },
+    "ddIS": 2935,
+    "ddOOS": 1923
+   },
+   "fade_med_OOS": -4767,
+   "fade_best": {
+    "strategy": "FADE S=13 F=19 buf 30% always | TIME 120h WF | SAR | entries any hour",
+    "IS": 1014,
+    "OOS": -2146,
+    "trades_IS": 3021,
+    "trades_OOS": 2265,
+    "fin_total": 506,
+    "by_year_worst_fb": {
+     "2019": -283,
+     "2020": 1551,
+     "2021": -208,
+     "2022": 76,
+     "2023": 70,
+     "2024": -817,
+     "2025": -1570,
+     "2026": 317
+    },
+    "ddIS": 8693,
+    "ddOOS": 3819
+   }
+  },
+  "TIME 120h | STOP | 1-hour window": {
+   "n": 50259,
+   "med_IS": -148,
+   "med_OOS": -55,
+   "share_OOS_pos": 0.447,
+   "spearman": 0.142,
+   "best": {
+    "strategy": "S=04 F=08 no buffer | TIME 120h WF | STOP | entries 11:00 only",
+    "IS": 1349,
+    "OOS": -560,
+    "trades_IS": 874,
+    "trades_OOS": 709,
+    "fin_total": 158,
+    "by_year_worst_fb": {
+     "2019": 2,
+     "2020": 6,
+     "2021": 598,
+     "2022": 742,
+     "2023": -307,
+     "2024": 22,
+     "2025": -304,
+     "2026": 29
+    },
+    "ddIS": 496,
+    "ddOOS": 721
+   },
+   "fade_med_OOS": -666,
+   "fade_best": {
+    "strategy": "FADE S=14 F=18 buf 30% always | TIME 120h WF | STOP | entries 06:00 only",
+    "IS": 1542,
+    "OOS": 663,
+    "trades_IS": 741,
+    "trades_OOS": 501,
+    "fin_total": 41,
+    "by_year_worst_fb": {
+     "2019": -114,
+     "2020": 617,
+     "2021": 225,
+     "2022": 824,
+     "2023": -81,
+     "2024": -30,
+     "2025": 494,
+     "2026": 287
+    },
+    "ddIS": 2384,
+    "ddOOS": 1396
+   }
+  },
+  "TIME 120h | STOP | any hour": {
+   "n": 2112,
+   "med_IS": -4923,
+   "med_OOS": -3908,
+   "share_OOS_pos": 0.001,
+   "spearman": 0.721,
+   "best": {
+    "strategy": "S=08 F=08 buf 30% always | TIME 120h WF | STOP | entries any hour",
+    "IS": -724,
+    "OOS": -2737,
+    "trades_IS": 1855,
+    "trades_OOS": 1683,
+    "fin_total": 500,
+    "by_year_worst_fb": {
+     "2019": -595,
+     "2020": -569,
+     "2021": 411,
+     "2022": 29,
+     "2023": -951,
+     "2024": -987,
+     "2025": -536,
+     "2026": -264
+    },
+    "ddIS": 1306,
+    "ddOOS": 2784
+   },
+   "fade_med_OOS": -3660,
+   "fade_best": {
+    "strategy": "FADE S=13 F=19 buf 30% always | TIME 120h WF | STOP | entries any hour",
+    "IS": 1095,
+    "OOS": -1882,
+    "trades_IS": 2216,
+    "trades_OOS": 1636,
+    "fin_total": 370,
+    "by_year_worst_fb": {
+     "2019": -35,
+     "2020": 1732,
+     "2021": -348,
+     "2022": -142,
+     "2023": -186,
+     "2024": -850,
+     "2025": -1051,
+     "2026": 259
+    },
+    "ddIS": 4983,
+    "ddOOS": 1385
+   }
+  },
+  "TIME 12h | HOLD | 1-hour window": {
+   "n": 50259,
+   "med_IS": -317,
+   "med_OOS": -425,
+   "share_OOS_pos": 0.322,
+   "spearman": 0.031,
+   "best": {
+    "strategy": "S=00 F=09 buf 11% overnight | TIME 12h WF | HOLD | entries 11:00 only",
+    "IS": 2080,
+    "OOS": -3152,
+    "trades_IS": 810,
+    "trades_OOS": 678,
+    "fin_total": 454,
+    "by_year_worst_fb": {
+     "2019": 270,
+     "2020": 540,
+     "2021": 601,
+     "2022": 631,
+     "2023": -1304,
+     "2024": -836,
+     "2025": -1203,
+     "2026": 186
+    },
+    "ddIS": 616,
+    "ddOOS": 3452
+   },
+   "fade_med_OOS": -581,
+   "fade_best": {
+    "strategy": "FADE S=00 F=11 buf 11% overnight | TIME 12h WF | HOLD | entries 12:00 only",
+    "IS": 1883,
+    "OOS": 559,
+    "trades_IS": 829,
+    "trades_OOS": 693,
+    "fin_total": 450,
+    "by_year_worst_fb": {
+     "2019": 117,
+     "2020": 327,
+     "2021": 174,
+     "2022": 1136,
+     "2023": -75,
+     "2024": -550,
+     "2025": 747,
+     "2026": 616
+    },
+    "ddIS": 3454,
+    "ddOOS": 2393
+   }
+  },
+  "TIME 12h | HOLD | any hour": {
+   "n": 2112,
+   "med_IS": -1306,
+   "med_OOS": -1218,
+   "share_OOS_pos": 0.285,
+   "spearman": -0.133,
+   "best": {
+    "strategy": "S=00 F=08 buf 30% always | TIME 12h WF | HOLD | entries any hour",
+    "IS": 1522,
+    "OOS": -2783,
+    "trades_IS": 2048,
+    "trades_OOS": 1620,
+    "fin_total": 526,
+    "by_year_worst_fb": {
+     "2019": 85,
+     "2020": 629,
+     "2021": 320,
+     "2022": 248,
+     "2023": -690,
+     "2024": -562,
+     "2025": -1905,
+     "2026": 178
+    },
+    "ddIS": 1152,
+    "ddOOS": 3203
+   },
+   "fade_med_OOS": -1250,
+   "fade_best": {
+    "strategy": "FADE S=12 F=19 buf 11% overnight | TIME 12h WF | HOLD | entries any hour",
+    "IS": 2242,
+    "OOS": -837,
+    "trades_IS": 1956,
+    "trades_OOS": 1509,
+    "fin_total": 554,
+    "by_year_worst_fb": {
+     "2019": -354,
+     "2020": 487,
+     "2021": -791,
+     "2022": 2748,
+     "2023": 276,
+     "2024": -744,
+     "2025": -466,
+     "2026": 269
+    },
+    "ddIS": 5296,
+    "ddOOS": 1821
+   }
+  },
+  "TIME 12h | SAR | 1-hour window": {
+   "n": 50259,
+   "med_IS": -291,
+   "med_OOS": -171,
+   "share_OOS_pos": 0.362,
+   "spearman": 0.081,
+   "best": {
+    "strategy": "S=13 F=13 buf 11% overnight | TIME 12h WF | SAR | entries 09:00 only",
+    "IS": 1391,
+    "OOS": 249,
+    "trades_IS": 891,
+    "trades_OOS": 694,
+    "fin_total": 71,
+    "by_year_worst_fb": {
+     "2019": 130,
+     "2020": 142,
+     "2021": 229,
+     "2022": 891,
+     "2023": 480,
+     "2024": 184,
+     "2025": -213,
+     "2026": -202
+    },
+    "ddIS": 398,
+    "ddOOS": 597
+   },
+   "fade_med_OOS": -649,
+   "fade_best": {
+    "strategy": "FADE S=11 F=19 buf 11% overnight | TIME 12h WF | SAR | entries 00:00 only",
+    "IS": 1239,
+    "OOS": -628,
+    "trades_IS": 699,
+    "trades_OOS": 501,
+    "fin_total": 0,
+    "by_year_worst_fb": {
+     "2019": 40,
+     "2020": 572,
+     "2021": -106,
+     "2022": 732,
+     "2023": -68,
+     "2024": -233,
+     "2025": -408,
+     "2026": 81
+    },
+    "ddIS": 2055,
+    "ddOOS": 257
+   }
+  },
+  "TIME 12h | SAR | any hour": {
+   "n": 2112,
+   "med_IS": -12309,
+   "med_OOS": -10202,
+   "share_OOS_pos": 0.0,
+   "spearman": 0.908,
+   "best": {
+    "strategy": "S=15 F=15 buf 30% always | TIME 12h WF | SAR | entries any hour",
+    "IS": -2842,
+    "OOS": -3386,
+    "trades_IS": 2547,
+    "trades_OOS": 1965,
+    "fin_total": 523,
+    "by_year_worst_fb": {
+     "2019": -472,
+     "2020": -2006,
+     "2021": -580,
+     "2022": 215,
+     "2023": -692,
+     "2024": -1182,
+     "2025": -997,
+     "2026": -515
+    },
+    "ddIS": 3317,
+    "ddOOS": 3661
+   },
+   "fade_med_OOS": -4950,
+   "fade_best": {
+    "strategy": "FADE S=14 F=19 buf 30% always | TIME 12h WF | SAR | entries any hour",
+    "IS": 932,
+    "OOS": -1998,
+    "trades_IS": 3451,
+    "trades_OOS": 2641,
+    "fin_total": 500,
+    "by_year_worst_fb": {
+     "2019": -261,
+     "2020": 1980,
+     "2021": -468,
+     "2022": -116,
+     "2023": -15,
+     "2024": -454,
+     "2025": -1605,
+     "2026": 261
+    },
+    "ddIS": 8494,
+    "ddOOS": 3714
+   }
+  },
+  "TIME 12h | STOP | 1-hour window": {
+   "n": 50259,
+   "med_IS": -158,
+   "med_OOS": -40,
+   "share_OOS_pos": 0.459,
+   "spearman": 0.093,
+   "best": {
+    "strategy": "S=13 F=13 buf 11% overnight | TIME 12h WF | STOP | entries 09:00 only",
+    "IS": 1415,
+    "OOS": 295,
+    "trades_IS": 887,
+    "trades_OOS": 691,
+    "fin_total": 71,
+    "by_year_worst_fb": {
+     "2019": 130,
+     "2020": 142,
+     "2021": 240,
+     "2022": 902,
+     "2023": 488,
+     "2024": 203,
+     "2025": -213,
+     "2026": -184
+    },
+    "ddIS": 398,
+    "ddOOS": 567
+   },
+   "fade_med_OOS": -670,
+   "fade_best": {
+    "strategy": "FADE S=14 F=19 buf 30% always | TIME 12h WF | STOP | entries 08:00 only",
+    "IS": 1244,
+    "OOS": 457,
+    "trades_IS": 704,
+    "trades_OOS": 517,
+    "fin_total": 7,
+    "by_year_worst_fb": {
+     "2019": -327,
+     "2020": 726,
+     "2021": 179,
+     "2022": 667,
+     "2023": -141,
+     "2024": -212,
+     "2025": 289,
+     "2026": 522
+    },
+    "ddIS": 2115,
+    "ddOOS": 1544
+   }
+  },
+  "TIME 12h | STOP | any hour": {
+   "n": 2112,
+   "med_IS": -5206,
+   "med_OOS": -4000,
+   "share_OOS_pos": 0.0,
+   "spearman": 0.683,
+   "best": {
+    "strategy": "S=08 F=08 buf 30% always | TIME 12h WF | STOP | entries any hour",
+    "IS": -1142,
+    "OOS": -3337,
+    "trades_IS": 2801,
+    "trades_OOS": 2426,
+    "fin_total": 495,
+    "by_year_worst_fb": {
+     "2019": -674,
+     "2020": -836,
+     "2021": 350,
+     "2022": 18,
+     "2023": -1273,
+     "2024": -1105,
+     "2025": -652,
+     "2026": -307
+    },
+    "ddIS": 1721,
+    "ddOOS": 3378
+   },
+   "fade_med_OOS": -3805,
+   "fade_best": {
+    "strategy": "FADE S=14 F=19 buf 30% always | TIME 12h WF | STOP | entries any hour",
+    "IS": 1044,
+    "OOS": -914,
+    "trades_IS": 2692,
+    "trades_OOS": 2051,
+    "fin_total": 364,
+    "by_year_worst_fb": {
+     "2019": -170,
+     "2020": 1937,
+     "2021": -643,
+     "2022": 65,
+     "2023": 127,
+     "2024": -503,
+     "2025": -815,
+     "2026": 401
+    },
+    "ddIS": 5391,
+    "ddOOS": 2476
+   }
+  },
+  "TIME 1h | HOLD | 1-hour window": {
+   "n": 50259,
+   "med_IS": -145,
+   "med_OOS": -136,
+   "share_OOS_pos": 0.262,
+   "spearman": 0.35,
+   "best": {
+    "strategy": "S=00 F=19 no buffer | TIME 1h WF | HOLD | entries 20:00 only",
+    "IS": 566,
+    "OOS": -364,
+    "trades_IS": 689,
+    "trades_OOS": 519,
+    "fin_total": 367,
+    "by_year_worst_fb": {
+     "2019": -32,
+     "2020": 162,
+     "2021": 99,
+     "2022": 314,
+     "2023": -7,
+     "2024": 46,
+     "2025": -378,
+     "2026": -24
+    },
+    "ddIS": 188,
+    "ddOOS": 534
+   },
+   "fade_med_OOS": -543,
+   "fade_best": {
+    "strategy": "FADE S=13 F=20 buf 30% overnight | TIME 1h WF | HOLD | entries 12:00 only",
+    "IS": 348,
+    "OOS": -763,
+    "trades_IS": 858,
+    "trades_OOS": 665,
+    "fin_total": 0,
+    "by_year_worst_fb": {
+     "2019": -18,
+     "2020": -9,
+     "2021": 4,
+     "2022": 371,
+     "2023": -296,
+     "2024": -373,
+     "2025": -150,
+     "2026": 56
+    },
+    "ddIS": 1312,
+    "ddOOS": 190
+   }
+  },
+  "TIME 1h | HOLD | any hour": {
+   "n": 2112,
+   "med_IS": -3750,
+   "med_OOS": -2662,
+   "share_OOS_pos": 0.176,
+   "spearman": 0.91,
+   "best": {
+    "strategy": "S=01 F=23 buf 11% overnight | TIME 1h WF | HOLD | entries any hour",
+    "IS": 1396,
+    "OOS": 1015,
+    "trades_IS": 18956,
+    "trades_OOS": 15364,
+    "fin_total": 380,
+    "by_year_worst_fb": {
+     "2019": -441,
+     "2020": 407,
+     "2021": -277,
+     "2022": 1707,
+     "2023": 270,
+     "2024": 195,
+     "2025": 246,
+     "2026": 245
+    },
+    "ddIS": 839,
+    "ddOOS": 820
+   },
+   "fade_med_OOS": -13170,
+   "fade_best": {
+    "strategy": "FADE S=15 F=19 buf 30% always | TIME 1h WF | HOLD | entries any hour",
+    "IS": -6714,
+    "OOS": -6020,
+    "trades_IS": 13602,
+    "trades_OOS": 10028,
+    "fin_total": 179,
+    "by_year_worst_fb": {
+     "2019": -2010,
+     "2020": -810,
+     "2021": -2180,
+     "2022": -1710,
+     "2023": -1557,
+     "2024": -2525,
+     "2025": -1781,
+     "2026": -68
+    },
+    "ddIS": 7586,
+    "ddOOS": 4502
+   }
+  },
+  "TIME 1h | SAR | 1-hour window": {
+   "n": 50259,
+   "med_IS": -387,
+   "med_OOS": -312,
+   "share_OOS_pos": 0.136,
+   "spearman": 0.374,
+   "best": {
+    "strategy": "S=00 F=17 buf 30% overnight | TIME 1h WF | SAR | entries 19:00 only",
+    "IS": 415,
+    "OOS": -468,
+    "trades_IS": 866,
+    "trades_OOS": 604,
+    "fin_total": 0,
+    "by_year_worst_fb": {
+     "2019": -150,
+     "2020": 254,
+     "2021": -128,
+     "2022": 429,
+     "2023": -220,
+     "2024": -1,
+     "2025": -279,
+     "2026": 29
+    },
+    "ddIS": 323,
+    "ddOOS": 688
+   },
+   "fade_med_OOS": -428,
+   "fade_best": {
+    "strategy": "FADE S=15 F=18 buf 30% overnight | TIME 1h WF | SAR | entries 14:00 only",
+    "IS": 302,
+    "OOS": 564,
+    "trades_IS": 1004,
+    "trades_OOS": 771,
+    "fin_total": 0,
+    "by_year_worst_fb": {
+     "2019": -205,
+     "2020": 299,
+     "2021": -316,
+     "2022": 524,
+     "2023": 9,
+     "2024": -219,
+     "2025": 617,
+     "2026": 157
+    },
+    "ddIS": 1587,
+    "ddOOS": 1513
+   }
+  },
+  "TIME 1h | SAR | any hour": {
+   "n": 2112,
+   "med_IS": -8407,
+   "med_OOS": -6951,
+   "share_OOS_pos": 0.0,
+   "spearman": 0.662,
+   "best": {
+    "strategy": "S=20 F=15 buf 30% overnight | TIME 1h WF | SAR | entries any hour",
+    "IS": -5586,
+    "OOS": -6733,
+    "trades_IS": 20021,
+    "trades_OOS": 16549,
+    "fin_total": 373,
+    "by_year_worst_fb": {
+     "2019": -1562,
+     "2020": -1347,
+     "2021": -1776,
+     "2022": -901,
+     "2023": -2812,
+     "2024": -852,
+     "2025": -2643,
+     "2026": -426
+    },
+    "ddIS": 5916,
+    "ddOOS": 6951
+   },
+   "fade_med_OOS": -10775,
+   "fade_best": {
+    "strategy": "FADE S=13 F=19 buf 30% always | TIME 1h WF | SAR | entries any hour",
+    "IS": -4774,
+    "OOS": -6207,
+    "trades_IS": 13757,
+    "trades_OOS": 10096,
+    "fin_total": 177,
+    "by_year_worst_fb": {
+     "2019": -1724,
+     "2020": -352,
+     "2021": -1706,
+     "2022": -971,
+     "2023": -1404,
+     "2024": -2512,
+     "2025": -2049,
+     "2026": -184
+    },
+    "ddIS": 9393,
+    "ddOOS": 4197
+   }
+  },
+  "TIME 1h | STOP | 1-hour window": {
+   "n": 50259,
+   "med_IS": -220,
+   "med_OOS": -182,
+   "share_OOS_pos": 0.195,
+   "spearman": 0.232,
+   "best": {
+    "strategy": "S=00 F=19 no buffer | TIME 1h WF | STOP | entries 20:00 only",
+    "IS": 461,
+    "OOS": -305,
+    "trades_IS": 689,
+    "trades_OOS": 519,
+    "fin_total": 322,
+    "by_year_worst_fb": {
+     "2019": -61,
+     "2020": 170,
+     "2021": 88,
+     "2022": 264,
+     "2023": -71,
+     "2024": 35,
+     "2025": -241,
+     "2026": -29
+    },
+    "ddIS": 172,
+    "ddOOS": 389
+   },
+   "fade_med_OOS": -457,
+   "fade_best": {
+    "strategy": "FADE S=15 F=18 buf 30% overnight | TIME 1h WF | STOP | entries 14:00 only",
+    "IS": 345,
+    "OOS": 410,
+    "trades_IS": 953,
+    "trades_OOS": 726,
+    "fin_total": 0,
+    "by_year_worst_fb": {
+     "2019": -164,
+     "2020": 320,
+     "2021": -290,
+     "2022": 479,
+     "2023": 14,
+     "2024": -249,
+     "2025": 452,
+     "2026": 193
+    },
+    "ddIS": 1399,
+    "ddOOS": 1137
+   }
+  },
+  "TIME 1h | STOP | any hour": {
+   "n": 2112,
+   "med_IS": -5432,
+   "med_OOS": -4030,
+   "share_OOS_pos": 0.0,
+   "spearman": 0.889,
+   "best": {
+    "strategy": "S=11 F=09 buf 30% overnight | TIME 1h WF | STOP | entries any hour",
+    "IS": -1661,
+    "OOS": -1392,
+    "trades_IS": 18645,
+    "trades_OOS": 15151,
+    "fin_total": 335,
+    "by_year_worst_fb": {
+     "2019": -678,
+     "2020": -534,
+     "2021": -852,
+     "2022": 402,
+     "2023": -794,
+     "2024": 44,
+     "2025": -623,
+     "2026": -19
+    },
+    "ddIS": 2415,
+    "ddOOS": 1602
+   },
+   "fade_med_OOS": -11116,
+   "fade_best": {
+    "strategy": "FADE S=14 F=19 buf 30% always | TIME 1h WF | STOP | entries any hour",
+    "IS": -5597,
+    "OOS": -6765,
+    "trades_IS": 13446,
+    "trades_OOS": 9902,
+    "fin_total": 167,
+    "by_year_worst_fb": {
+     "2019": -1857,
+     "2020": -401,
+     "2021": -1724,
+     "2022": -1531,
+     "2023": -1484,
+     "2024": -2307,
+     "2025": -2560,
+     "2026": -311
+    },
+    "ddIS": 8085,
+    "ddOOS": 3488
+   }
+  },
+  "TIME 24h | HOLD | 1-hour window": {
+   "n": 50259,
+   "med_IS": -631,
+   "med_OOS": -762,
+   "share_OOS_pos": 0.252,
+   "spearman": 0.393,
+   "best": {
+    "strategy": "S=00 F=12 buf 30% overnight | TIME 24h WF | HOLD | entries 15:00 only",
+    "IS": 2515,
+    "OOS": 1161,
+    "trades_IS": 936,
+    "trades_OOS": 746,
+    "fin_total": 481,
+    "by_year_worst_fb": {
+     "2019": -465,
+     "2020": 1038,
+     "2021": 488,
+     "2022": 1420,
+     "2023": 345,
+     "2024": -470,
+     "2025": 959,
+     "2026": 312
+    },
+    "ddIS": 766,
+    "ddOOS": 895
+   },
+   "fade_med_OOS": -411,
+   "fade_best": {
+    "strategy": "FADE S=09 F=17 buf 30% overnight | TIME 24h WF | HOLD | entries 08:00 only",
+    "IS": 3685,
+    "OOS": 1952,
+    "trades_IS": 846,
+    "trades_OOS": 604,
+    "fin_total": 449,
+    "by_year_worst_fb": {
+     "2019": -224,
+     "2020": 2202,
+     "2021": 822,
+     "2022": 1055,
+     "2023": -215,
+     "2024": -98,
+     "2025": 2020,
+     "2026": 384
+    },
+    "ddIS": 5150,
+    "ddOOS": 3298
+   }
+  },
+  "TIME 24h | HOLD | any hour": {
+   "n": 2112,
+   "med_IS": 852,
+   "med_OOS": -900,
+   "share_OOS_pos": 0.051,
+   "spearman": 0.746,
+   "best": {
+    "strategy": "S=23 F=07 no buffer | TIME 24h WF | HOLD | entries any hour",
+    "IS": 3462,
+    "OOS": 35,
+    "trades_IS": 1034,
+    "trades_OOS": 819,
+    "fin_total": 504,
+    "by_year_worst_fb": {
+     "2019": -56,
+     "2020": 2364,
+     "2021": 489,
+     "2022": 345,
+     "2023": -440,
+     "2024": 989,
+     "2025": -740,
+     "2026": -30
+    },
+    "ddIS": 674,
+    "ddOOS": 1079
+   },
+   "fade_med_OOS": -669,
+   "fade_best": {
+    "strategy": "FADE S=05 F=14 no buffer | TIME 24h WF | HOLD | entries any hour",
+    "IS": 2408,
+    "OOS": -411,
+    "trades_IS": 1034,
+    "trades_OOS": 818,
+    "fin_total": 535,
+    "by_year_worst_fb": {
+     "2019": 19,
+     "2020": 1114,
+     "2021": -303,
+     "2022": 1778,
+     "2023": -702,
+     "2024": -584,
+     "2025": 943,
+     "2026": 132
+    },
+    "ddIS": 4303,
+    "ddOOS": 1939
+   }
+  },
+  "TIME 24h | SAR | 1-hour window": {
+   "n": 50259,
+   "med_IS": -282,
+   "med_OOS": -174,
+   "share_OOS_pos": 0.355,
+   "spearman": 0.12,
+   "best": {
+    "strategy": "S=20 F=08 no buffer | TIME 24h WF | SAR | entries 12:00 only",
+    "IS": 1386,
+    "OOS": -1157,
+    "trades_IS": 986,
+    "trades_OOS": 854,
+    "fin_total": 135,
+    "by_year_worst_fb": {
+     "2019": 268,
+     "2020": -89,
+     "2021": 530,
+     "2022": 677,
+     "2023": -378,
+     "2024": -111,
+     "2025": -812,
+     "2026": 144
+    },
+    "ddIS": 453,
+    "ddOOS": 1400
+   },
+   "fade_med_OOS": -642,
+   "fade_best": {
+    "strategy": "FADE S=14 F=18 buf 30% always | TIME 24h WF | SAR | entries 06:00 only",
+    "IS": 1486,
+    "OOS": 738,
+    "trades_IS": 769,
+    "trades_OOS": 524,
+    "fin_total": 41,
+    "by_year_worst_fb": {
+     "2019": -152,
+     "2020": 637,
+     "2021": 188,
+     "2022": 823,
+     "2023": -5,
+     "2024": -8,
+     "2025": 472,
+     "2026": 286
+    },
+    "ddIS": 2359,
+    "ddOOS": 1476
+   }
+  },
+  "TIME 24h | SAR | any hour": {
+   "n": 2112,
+   "med_IS": -12189,
+   "med_OOS": -10152,
+   "share_OOS_pos": 0.0,
+   "spearman": 0.912,
+   "best": {
+    "strategy": "S=14 F=14 buf 30% overnight | TIME 24h WF | SAR | entries any hour",
+    "IS": -2675,
+    "OOS": -1668,
+    "trades_IS": 1972,
+    "trades_OOS": 1554,
+    "fin_total": 523,
+    "by_year_worst_fb": {
+     "2019": -81,
+     "2020": -1507,
+     "2021": -523,
+     "2022": -565,
+     "2023": -880,
+     "2024": -174,
+     "2025": -305,
+     "2026": -407
+    },
+    "ddIS": 3097,
+    "ddOOS": 2151
+   },
+   "fade_med_OOS": -4789,
+   "fade_best": {
+    "strategy": "FADE S=13 F=19 buf 30% always | TIME 24h WF | SAR | entries any hour",
+    "IS": 983,
+    "OOS": -2287,
+    "trades_IS": 3089,
+    "trades_OOS": 2333,
+    "fin_total": 502,
+    "by_year_worst_fb": {
+     "2019": -318,
+     "2020": 1508,
+     "2021": -227,
+     "2022": 139,
+     "2023": 24,
+     "2024": -786,
+     "2025": -1635,
+     "2026": 281
+    },
+    "ddIS": 8360,
+    "ddOOS": 3614
+   }
+  },
+  "TIME 24h | STOP | 1-hour window": {
+   "n": 50259,
+   "med_IS": -151,
+   "med_OOS": -52,
+   "share_OOS_pos": 0.451,
+   "spearman": 0.146,
+   "best": {
+    "strategy": "S=04 F=08 no buffer | TIME 24h WF | STOP | entries 11:00 only",
+    "IS": 1403,
+    "OOS": -544,
+    "trades_IS": 876,
+    "trades_OOS": 710,
+    "fin_total": 158,
+    "by_year_worst_fb": {
+     "2019": 2,
+     "2020": 6,
+     "2021": 612,
+     "2022": 782,
+     "2023": -307,
+     "2024": 20,
+     "2025": -307,
+     "2026": 50
+    },
+    "ddIS": 496,
+    "ddOOS": 723
+   },
+   "fade_med_OOS": -669,
+   "fade_best": {
+    "strategy": "FADE S=14 F=18 buf 30% always | TIME 24h WF | STOP | entries 06:00 only",
+    "IS": 1451,
+    "OOS": 729,
+    "trades_IS": 766,
+    "trades_OOS": 523,
+    "fin_total": 40,
+    "by_year_worst_fb": {
+     "2019": -152,
+     "2020": 603,
+     "2021": 188,
+     "2022": 823,
+     "2023": -5,
+     "2024": -8,
+     "2025": 463,
+     "2026": 286
+    },
+    "ddIS": 2321,
+    "ddOOS": 1465
+   }
+  },
+  "TIME 24h | STOP | any hour": {
+   "n": 2112,
+   "med_IS": -4932,
+   "med_OOS": -3897,
+   "share_OOS_pos": 0.001,
+   "spearman": 0.725,
+   "best": {
+    "strategy": "S=08 F=08 buf 30% always | TIME 24h WF | STOP | entries any hour",
+    "IS": -697,
+    "OOS": -3027,
+    "trades_IS": 2072,
+    "trades_OOS": 1841,
+    "fin_total": 498,
+    "by_year_worst_fb": {
+     "2019": -617,
+     "2020": -745,
+     "2021": 378,
+     "2022": 287,
+     "2023": -1073,
+     "2024": -1009,
+     "2025": -661,
+     "2026": -285
+    },
+    "ddIS": 1506,
+    "ddOOS": 3073
+   },
+   "fade_med_OOS": -3659,
+   "fade_best": {
+    "strategy": "FADE S=13 F=19 buf 30% always | TIME 24h WF | STOP | entries any hour",
+    "IS": 1127,
+    "OOS": -1770,
+    "trades_IS": 2276,
+    "trades_OOS": 1698,
+    "fin_total": 367,
+    "by_year_worst_fb": {
+     "2019": -67,
+     "2020": 1719,
+     "2021": -348,
+     "2022": -64,
+     "2023": -145,
+     "2024": -900,
+     "2025": -859,
+     "2026": 236
+    },
+    "ddIS": 5140,
+    "ddOOS": 1348
+   }
+  },
+  "TIME 2h | HOLD | 1-hour window": {
+   "n": 50259,
+   "med_IS": -256,
+   "med_OOS": -130,
+   "share_OOS_pos": 0.293,
+   "spearman": 0.164,
+   "best": {
+    "strategy": "S=00 F=18 no buffer | TIME 2h WF | HOLD | entries 19:00 only",
+    "IS": 895,
+    "OOS": -377,
+    "trades_IS": 924,
+    "trades_OOS": 698,
+    "fin_total": 498,
+    "by_year_worst_fb": {
+     "2019": -201,
+     "2020": 228,
+     "2021": 87,
+     "2022": 567,
+     "2023": 176,
+     "2024": -21,
+     "2025": -391,
+     "2026": -140
+    },
+    "ddIS": 427,
+    "ddOOS": 757
+   },
+   "fade_med_OOS": -552,
+   "fade_best": {
+    "strategy": "FADE S=14 F=18 buf 30% overnight | TIME 2h WF | HOLD | entries 13:00 only",
+    "IS": 689,
+    "OOS": 173,
+    "trades_IS": 910,
+    "trades_OOS": 689,
+    "fin_total": 0,
+    "by_year_worst_fb": {
+     "2019": -274,
+     "2020": 928,
+     "2021": -283,
+     "2022": 300,
+     "2023": -166,
+     "2024": 95,
+     "2025": 35,
+     "2026": 165
+    },
+    "ddIS": 1808,
+    "ddOOS": 1081
+   }
+  },
+  "TIME 2h | HOLD | any hour": {
+   "n": 2112,
+   "med_IS": -2633,
+   "med_OOS": -937,
+   "share_OOS_pos": 0.361,
+   "spearman": 0.606,
+   "best": {
+    "strategy": "S=19 F=08 buf 30% overnight | TIME 2h WF | HOLD | entries any hour",
+    "IS": 827,
+    "OOS": -2146,
+    "trades_IS": 10101,
+    "trades_OOS": 8164,
+    "fin_total": 471,
+    "by_year_worst_fb": {
+     "2019": -890,
+     "2020": 111,
+     "2021": 127,
+     "2022": 1403,
+     "2023": -998,
+     "2024": -454,
+     "2025": -769,
+     "2026": 74
+    },
+    "ddIS": 1382,
+    "ddOOS": 2563
+   },
+   "fade_med_OOS": -7977,
+   "fade_best": {
+    "strategy": "FADE S=11 F=19 buf 30% always | TIME 2h WF | HOLD | entries any hour",
+    "IS": -2848,
+    "OOS": -5967,
+    "trades_IS": 7788,
+    "trades_OOS": 5833,
+    "fin_total": 339,
+    "by_year_worst_fb": {
+     "2019": -800,
+     "2020": 373,
+     "2021": -1283,
+     "2022": -1296,
+     "2023": -1223,
+     "2024": -1825,
+     "2025": -2454,
+     "2026": -431
+    },
+    "ddIS": 5582,
+    "ddOOS": 1157
+   }
+  },
+  "TIME 2h | SAR | 1-hour window": {
+   "n": 50259,
+   "med_IS": -366,
+   "med_OOS": -268,
+   "share_OOS_pos": 0.216,
+   "spearman": 0.197,
+   "best": {
+    "strategy": "S=20 F=15 buf 30% overnight | TIME 2h WF | SAR | entries 19:00 only",
+    "IS": 846,
+    "OOS": -888,
+    "trades_IS": 744,
+    "trades_OOS": 592,
+    "fin_total": 263,
+    "by_year_worst_fb": {
+     "2019": -100,
+     "2020": 398,
+     "2021": 138,
+     "2022": 396,
+     "2023": -302,
+     "2024": -38,
+     "2025": -299,
+     "2026": -248
+    },
+    "ddIS": 339,
+    "ddOOS": 925
+   },
+   "fade_med_OOS": -508,
+   "fade_best": {
+    "strategy": "FADE S=02 F=20 buf 30% overnight | TIME 2h WF | SAR | entries 00:00 only",
+    "IS": 393,
+    "OOS": -240,
+    "trades_IS": 716,
+    "trades_OOS": 457,
+    "fin_total": 0,
+    "by_year_worst_fb": {
+     "2019": -91,
+     "2020": 258,
+     "2021": -45,
+     "2022": 245,
+     "2023": -28,
+     "2024": -182,
+     "2025": -80,
+     "2026": 50
+    },
+    "ddIS": 1203,
+    "ddOOS": 259
+   }
+  },
+  "TIME 2h | SAR | any hour": {
+   "n": 2112,
+   "med_IS": -11437,
+   "med_OOS": -9627,
+   "share_OOS_pos": 0.0,
+   "spearman": 0.869,
+   "best": {
+    "strategy": "S=14 F=14 buf 30% always | TIME 2h WF | SAR | entries any hour",
+    "IS": -4544,
+    "OOS": -3833,
+    "trades_IS": 8835,
+    "trades_OOS": 6790,
+    "fin_total": 422,
+    "by_year_worst_fb": {
+     "2019": -897,
+     "2020": -2040,
+     "2021": -1145,
+     "2022": -462,
+     "2023": -1465,
+     "2024": -1150,
+     "2025": -873,
+     "2026": -380
+    },
+    "ddIS": 4801,
+    "ddOOS": 3908
+   },
+   "fade_med_OOS": -7565,
+   "fade_best": {
+    "strategy": "FADE S=13 F=19 buf 30% always | TIME 2h WF | SAR | entries any hour",
+    "IS": -2097,
+    "OOS": -4776,
+    "trades_IS": 8549,
+    "trades_OOS": 6313,
+    "fin_total": 359,
+    "by_year_worst_fb": {
+     "2019": -1057,
+     "2020": 105,
+     "2021": -763,
+     "2022": -331,
+     "2023": -915,
+     "2024": -1918,
+     "2025": -1839,
+     "2026": -21
+    },
+    "ddIS": 8305,
+    "ddOOS": 3861
+   }
+  },
+  "TIME 2h | STOP | 1-hour window": {
+   "n": 50259,
+   "med_IS": -244,
+   "med_OOS": -122,
+   "share_OOS_pos": 0.276,
+   "spearman": 0.11,
+   "best": {
+    "strategy": "S=20 F=15 buf 30% overnight | TIME 2h WF | STOP | entries 19:00 only",
+    "IS": 730,
+    "OOS": -579,
+    "trades_IS": 726,
+    "trades_OOS": 573,
+    "fin_total": 255,
+    "by_year_worst_fb": {
+     "2019": -75,
+     "2020": 413,
+     "2021": 165,
+     "2022": 228,
+     "2023": -137,
+     "2024": -25,
+     "2025": -251,
+     "2026": -166
+    },
+    "ddIS": 442,
+    "ddOOS": 642
+   },
+   "fade_med_OOS": -501,
+   "fade_best": {
+    "strategy": "FADE S=15 F=18 buf 30% overnight | TIME 2h WF | STOP | entries 13:00 only",
+    "IS": 482,
+    "OOS": 373,
+    "trades_IS": 910,
+    "trades_OOS": 689,
+    "fin_total": 0,
+    "by_year_worst_fb": {
+     "2019": -276,
+     "2020": 890,
+     "2021": -276,
+     "2022": 143,
+     "2023": -88,
+     "2024": 177,
+     "2025": 154,
+     "2026": 130
+    },
+    "ddIS": 1528,
+    "ddOOS": 1212
+   }
+  },
+  "TIME 2h | STOP | any hour": {
+   "n": 2112,
+   "med_IS": -5518,
+   "med_OOS": -3850,
+   "share_OOS_pos": 0.0,
+   "spearman": 0.194,
+   "best": {
+    "strategy": "S=20 F=08 buf 30% always | TIME 2h WF | STOP | entries any hour",
+    "IS": -2103,
+    "OOS": -4231,
+    "trades_IS": 9253,
+    "trades_OOS": 7610,
+    "fin_total": 327,
+    "by_year_worst_fb": {
+     "2019": -882,
+     "2020": -865,
+     "2021": -281,
+     "2022": -74,
+     "2023": -1780,
+     "2024": -1114,
+     "2025": -1316,
+     "2026": -22
+    },
+    "ddIS": 2416,
+    "ddOOS": 4496
+   },
+   "fade_med_OOS": -6843,
+   "fade_best": {
+    "strategy": "FADE S=11 F=19 buf 30% always | TIME 2h WF | STOP | entries any hour",
+    "IS": -2145,
+    "OOS": -4756,
+    "trades_IS": 7923,
+    "trades_OOS": 5924,
+    "fin_total": 304,
+    "by_year_worst_fb": {
+     "2019": -864,
+     "2020": 390,
+     "2021": -995,
+     "2022": -615,
+     "2023": -795,
+     "2024": -1637,
+     "2025": -2050,
+     "2026": -160
+    },
+    "ddIS": 7177,
+    "ddOOS": 2592
+   }
+  },
+  "TIME 48h | HOLD | 1-hour window": {
+   "n": 48294,
+   "med_IS": -449,
+   "med_OOS": -606,
+   "share_OOS_pos": 0.305,
+   "spearman": 0.237,
+   "best": {
+    "strategy": "S=00 F=02 buf 30% overnight | TIME 48h WF | HOLD | entries 07:00 only",
+    "IS": 2354,
+    "OOS": -383,
+    "trades_IS": 546,
+    "trades_OOS": 454,
+    "fin_total": 515,
+    "by_year_worst_fb": {
+     "2019": 135,
+     "2020": 1120,
+     "2021": 9,
+     "2022": 832,
+     "2023": -680,
+     "2024": 447,
+     "2025": -118,
+     "2026": -79
+    },
+    "ddIS": 1506,
+    "ddOOS": 1262
+   },
+   "fade_med_OOS": -322,
+   "fade_best": {
+    "strategy": "FADE S=09 F=18 buf 30% overnight | TIME 48h WF | HOLD | entries 08:00 only",
+    "IS": 3309,
+    "OOS": 1660,
+    "trades_IS": 513,
+    "trades_OOS": 370,
+    "fin_total": 479,
+    "by_year_worst_fb": {
+     "2019": 35,
+     "2020": 1032,
+     "2021": 488,
+     "2022": 1944,
+     "2023": -255,
+     "2024": 92,
+     "2025": 1551,
+     "2026": 427
+    },
+    "ddIS": 4331,
+    "ddOOS": 2866
+   }
+  },
+  "TIME 48h | HOLD | any hour": {
+   "n": 2112,
+   "med_IS": 302,
+   "med_OOS": -184,
+   "share_OOS_pos": 0.236,
+   "spearman": 0.27,
+   "best": {
+    "strategy": "S=02 F=23 buf 30% overnight | TIME 48h WF | HOLD | entries any hour",
+    "IS": 1759,
+    "OOS": -897,
+    "trades_IS": 617,
+    "trades_OOS": 489,
+    "fin_total": 550,
+    "by_year_worst_fb": {
+     "2019": 422,
+     "2020": 398,
+     "2021": -158,
+     "2022": 1095,
+     "2023": -111,
+     "2024": 614,
+     "2025": -1292,
+     "2026": -108
+    },
+    "ddIS": 924,
+    "ddOOS": 1776
+   },
+   "fade_med_OOS": -1428,
+   "fade_best": {
+    "strategy": "FADE S=01 F=14 no buffer | TIME 48h WF | HOLD | entries any hour",
+    "IS": 2239,
+    "OOS": -805,
+    "trades_IS": 617,
+    "trades_OOS": 489,
+    "fin_total": 565,
+    "by_year_worst_fb": {
+     "2019": -260,
+     "2020": 1260,
+     "2021": 327,
+     "2022": 1098,
+     "2023": -252,
+     "2024": -261,
+     "2025": -144,
+     "2026": 8
+    },
+    "ddIS": 3632,
+    "ddOOS": 1080
+   }
+  },
+  "TIME 48h | SAR | 1-hour window": {
+   "n": 50259,
+   "med_IS": -282,
+   "med_OOS": -180,
+   "share_OOS_pos": 0.351,
+   "spearman": 0.116,
+   "best": {
+    "strategy": "S=20 F=08 no buffer | TIME 48h WF | SAR | entries 12:00 only",
+    "IS": 1373,
+    "OOS": -1154,
+    "trades_IS": 986,
+    "trades_OOS": 854,
+    "fin_total": 135,
+    "by_year_worst_fb": {
+     "2019": 268,
+     "2020": -89,
+     "2021": 517,
+     "2022": 677,
+     "2023": -378,
+     "2024": -114,
+     "2025": -806,
+     "2026": 144
+    },
+    "ddIS": 457,
+    "ddOOS": 1397
+   },
+   "fade_med_OOS": -639,
+   "fade_best": {
+    "strategy": "FADE S=14 F=18 buf 30% always | TIME 48h WF | SAR | entries 06:00 only",
+    "IS": 1553,
+    "OOS": 691,
+    "trades_IS": 745,
+    "trades_OOS": 504,
+    "fin_total": 42,
+    "by_year_worst_fb": {
+     "2019": -114,
+     "2020": 652,
+     "2021": 201,
+     "2022": 824,
+     "2023": -62,
+     "2024": -30,
+     "2025": 503,
+     "2026": 287
+    },
+    "ddIS": 2400,
+    "ddOOS": 1428
+   }
+  },
+  "TIME 48h | SAR | any hour": {
+   "n": 2112,
+   "med_IS": -12247,
+   "med_OOS": -10172,
+   "share_OOS_pos": 0.0,
+   "spearman": 0.91,
+   "best": {
+    "strategy": "S=14 F=14 buf 30% always | TIME 48h WF | SAR | entries any hour",
+    "IS": -2525,
+    "OOS": -1316,
+    "trades_IS": 1517,
+    "trades_OOS": 1177,
+    "fin_total": 522,
+    "by_year_worst_fb": {
+     "2019": -269,
+     "2020": -1635,
+     "2021": -387,
+     "2022": -234,
+     "2023": -445,
+     "2024": -393,
+     "2025": -595,
+     "2026": 76
+    },
+    "ddIS": 2861,
+    "ddOOS": 1702
+   },
+   "fade_med_OOS": -4767,
+   "fade_best": {
+    "strategy": "FADE S=13 F=19 buf 30% always | TIME 48h WF | SAR | entries any hour",
+    "IS": 1014,
+    "OOS": -2124,
+    "trades_IS": 3022,
+    "trades_OOS": 2269,
+    "fin_total": 507,
+    "by_year_worst_fb": {
+     "2019": -283,
+     "2020": 1551,
+     "2021": -197,
+     "2022": 65,
+     "2023": 109,
+     "2024": -833,
+     "2025": -1570,
+     "2026": 317
+    },
+    "ddIS": 8695,
+    "ddOOS": 3843
+   }
+  },
+  "TIME 48h | STOP | 1-hour window": {
+   "n": 50259,
+   "med_IS": -148,
+   "med_OOS": -54,
+   "share_OOS_pos": 0.447,
+   "spearman": 0.141,
+   "best": {
+    "strategy": "S=04 F=08 no buffer | TIME 48h WF | STOP | entries 11:00 only",
+    "IS": 1349,
+    "OOS": -560,
+    "trades_IS": 874,
+    "trades_OOS": 709,
+    "fin_total": 158,
+    "by_year_worst_fb": {
+     "2019": 2,
+     "2020": 6,
+     "2021": 598,
+     "2022": 742,
+     "2023": -307,
+     "2024": 22,
+     "2025": -304,
+     "2026": 29
+    },
+    "ddIS": 496,
+    "ddOOS": 721
+   },
+   "fade_med_OOS": -666,
+   "fade_best": {
+    "strategy": "FADE S=14 F=18 buf 30% always | TIME 48h WF | STOP | entries 06:00 only",
+    "IS": 1542,
+    "OOS": 662,
+    "trades_IS": 741,
+    "trades_OOS": 502,
+    "fin_total": 41,
+    "by_year_worst_fb": {
+     "2019": -114,
+     "2020": 617,
+     "2021": 225,
+     "2022": 824,
+     "2023": -81,
+     "2024": -30,
+     "2025": 494,
+     "2026": 287
+    },
+    "ddIS": 2384,
+    "ddOOS": 1397
+   }
+  },
+  "TIME 48h | STOP | any hour": {
+   "n": 2112,
+   "med_IS": -4930,
+   "med_OOS": -3907,
+   "share_OOS_pos": 0.001,
+   "spearman": 0.722,
+   "best": {
+    "strategy": "S=08 F=08 buf 30% always | TIME 48h WF | STOP | entries any hour",
+    "IS": -765,
+    "OOS": -2747,
+    "trades_IS": 1874,
+    "trades_OOS": 1694,
+    "fin_total": 500,
+    "by_year_worst_fb": {
+     "2019": -603,
+     "2020": -582,
+     "2021": 401,
+     "2022": 19,
+     "2023": -964,
+     "2024": -976,
+     "2025": -543,
+     "2026": -264
+    },
+    "ddIS": 1338,
+    "ddOOS": 2793
+   },
+   "fade_med_OOS": -3660,
+   "fade_best": {
+    "strategy": "FADE S=13 F=19 buf 30% always | TIME 48h WF | STOP | entries any hour",
+    "IS": 1098,
+    "OOS": -1867,
+    "trades_IS": 2218,
+    "trades_OOS": 1640,
+    "fin_total": 371,
+    "by_year_worst_fb": {
+     "2019": -35,
+     "2020": 1732,
+     "2021": -341,
+     "2022": -146,
+     "2023": -171,
+     "2024": -849,
+     "2025": -1051,
+     "2026": 259
+    },
+    "ddIS": 4988,
+    "ddOOS": 1397
+   }
+  },
+  "TIME 4h | HOLD | 1-hour window": {
+   "n": 50259,
+   "med_IS": -203,
+   "med_OOS": -195,
+   "share_OOS_pos": 0.343,
+   "spearman": 0.043,
+   "best": {
+    "strategy": "S=16 F=18 no buffer | TIME 4h WF | HOLD | entries 15:00 only",
+    "IS": 1189,
+    "OOS": -644,
+    "trades_IS": 997,
+    "trades_OOS": 789,
+    "fin_total": 25,
+    "by_year_worst_fb": {
+     "2019": 79,
+     "2020": 348,
+     "2021": 291,
+     "2022": 464,
+     "2023": -190,
+     "2024": 20,
+     "2025": -583,
+     "2026": 93
+    },
+    "ddIS": 348,
+    "ddOOS": 1088
+   },
+   "fade_med_OOS": -524,
+   "fade_best": {
+    "strategy": "FADE S=00 F=16 buf 30% overnight | TIME 4h WF | HOLD | entries 17:00 only",
+    "IS": 827,
+    "OOS": -1097,
+    "trades_IS": 499,
+    "trades_OOS": 429,
+    "fin_total": 255,
+    "by_year_worst_fb": {
+     "2019": -154,
+     "2020": 912,
+     "2021": -140,
+     "2022": 314,
+     "2023": -176,
+     "2024": -353,
+     "2025": -552,
+     "2026": 117
+    },
+    "ddIS": 1653,
+    "ddOOS": 424
+   }
+  },
+  "TIME 4h | HOLD | any hour": {
+   "n": 2112,
+   "med_IS": -1616,
+   "med_OOS": -1310,
+   "share_OOS_pos": 0.25,
+   "spearman": 0.293,
+   "best": {
+    "strategy": "S=15 F=09 no buffer | TIME 4h WF | HOLD | entries any hour",
+    "IS": 1889,
+    "OOS": 240,
+    "trades_IS": 5679,
+    "trades_OOS": 4552,
+    "fin_total": 514,
+    "by_year_worst_fb": {
+     "2019": -689,
+     "2020": 1493,
+     "2021": 103,
+     "2022": 775,
+     "2023": -575,
+     "2024": 114,
+     "2025": 320,
+     "2026": 381
+    },
+    "ddIS": 840,
+    "ddOOS": 1006
+   },
+   "fade_med_OOS": -4024,
+   "fade_best": {
+    "strategy": "FADE S=14 F=16 buf 30% always | TIME 4h WF | HOLD | entries any hour",
+    "IS": -1058,
+    "OOS": -1427,
+    "trades_IS": 4967,
+    "trades_OOS": 3736,
+    "fin_total": 472,
+    "by_year_worst_fb": {
+     "2019": -320,
+     "2020": 964,
+     "2021": -676,
+     "2022": -866,
+     "2023": -541,
+     "2024": -689,
+     "2025": -560,
+     "2026": 473
+    },
+    "ddIS": 4824,
+    "ddOOS": 3147
+   }
+  },
+  "TIME 4h | SAR | 1-hour window": {
+   "n": 50259,
+   "med_IS": -344,
+   "med_OOS": -184,
+   "share_OOS_pos": 0.299,
+   "spearman": 0.217,
+   "best": {
+    "strategy": "S=15 F=08 no buffer | TIME 4h WF | SAR | entries 12:00 only",
+    "IS": 798,
+    "OOS": -1229,
+    "trades_IS": 986,
+    "trades_OOS": 854,
+    "fin_total": 0,
+    "by_year_worst_fb": {
+     "2019": 197,
+     "2020": -597,
+     "2021": 625,
+     "2022": 567,
+     "2023": -502,
+     "2024": -354,
+     "2025": -631,
+     "2026": 258
+    },
+    "ddIS": 649,
+    "ddOOS": 1526
+   },
+   "fade_med_OOS": -615,
+   "fade_best": {
+    "strategy": "FADE S=10 F=18 buf 30% overnight | TIME 4h WF | SAR | entries 06:00 only",
+    "IS": 572,
+    "OOS": -205,
+    "trades_IS": 769,
+    "trades_OOS": 525,
+    "fin_total": 0,
+    "by_year_worst_fb": {
+     "2019": -10,
+     "2020": 159,
+     "2021": -165,
+     "2022": 588,
+     "2023": 13,
+     "2024": 23,
+     "2025": -324,
+     "2026": 83
+    },
+    "ddIS": 1358,
+    "ddOOS": 537
+   }
+  },
+  "TIME 4h | SAR | any hour": {
+   "n": 2112,
+   "med_IS": -12142,
+   "med_OOS": -10207,
+   "share_OOS_pos": 0.0,
+   "spearman": 0.92,
+   "best": {
+    "strategy": "S=14 F=14 buf 30% always | TIME 4h WF | SAR | entries any hour",
+    "IS": -3406,
+    "OOS": -2284,
+    "trades_IS": 5175,
+    "trades_OOS": 3934,
+    "fin_total": 446,
+    "by_year_worst_fb": {
+     "2019": -555,
+     "2020": -1365,
+     "2021": -676,
+     "2022": -810,
+     "2023": -810,
+     "2024": -614,
+     "2025": -678,
+     "2026": -227
+    },
+    "ddIS": 3612,
+    "ddOOS": 2533
+   },
+   "fade_med_OOS": -5915,
+   "fade_best": {
+    "strategy": "FADE S=13 F=19 buf 30% always | TIME 4h WF | SAR | entries any hour",
+    "IS": -241,
+    "OOS": -3268,
+    "trades_IS": 5792,
+    "trades_OOS": 4275,
+    "fin_total": 456,
+    "by_year_worst_fb": {
+     "2019": -609,
+     "2020": 1075,
+     "2021": -479,
+     "2022": -83,
+     "2023": -449,
+     "2024": -1205,
+     "2025": -1497,
+     "2026": 92
+    },
+    "ddIS": 8825,
+    "ddOOS": 4223
+   }
+  },
+  "TIME 4h | STOP | 1-hour window": {
+   "n": 50259,
+   "med_IS": -207,
+   "med_OOS": -71,
+   "share_OOS_pos": 0.389,
+   "spearman": 0.229,
+   "best": {
+    "strategy": "S=18 F=19 buf 30% overnight | TIME 4h WF | STOP | entries 15:00 only",
+    "IS": 914,
+    "OOS": -597,
+    "trades_IS": 857,
+    "trades_OOS": 688,
+    "fin_total": 17,
+    "by_year_worst_fb": {
+     "2019": 9,
+     "2020": 556,
+     "2021": 329,
+     "2022": 20,
+     "2023": -196,
+     "2024": 99,
+     "2025": -720,
+     "2026": 221
+    },
+    "ddIS": 467,
+    "ddOOS": 965
+   },
+   "fade_med_OOS": -604,
+   "fade_best": {
+    "strategy": "FADE S=10 F=18 buf 30% overnight | TIME 4h WF | STOP | entries 06:00 only",
+    "IS": 544,
+    "OOS": -198,
+    "trades_IS": 766,
+    "trades_OOS": 524,
+    "fin_total": 0,
+    "by_year_worst_fb": {
+     "2019": -10,
+     "2020": 131,
+     "2021": -165,
+     "2022": 588,
+     "2023": 13,
+     "2024": 23,
+     "2025": -317,
+     "2026": 83
+    },
+    "ddIS": 1321,
+    "ddOOS": 537
+   }
+  },
+  "TIME 4h | STOP | any hour": {
+   "n": 2112,
+   "med_IS": -5539,
+   "med_OOS": -4203,
+   "share_OOS_pos": 0.0,
+   "spearman": 0.579,
+   "best": {
+    "strategy": "S=03 F=09 buf 30% always | TIME 4h WF | STOP | entries any hour",
+    "IS": -1963,
+    "OOS": -4722,
+    "trades_IS": 6259,
+    "trades_OOS": 5181,
+    "fin_total": 501,
+    "by_year_worst_fb": {
+     "2019": -773,
+     "2020": -723,
+     "2021": -350,
+     "2022": -117,
+     "2023": -2021,
+     "2024": -849,
+     "2025": -1509,
+     "2026": -345
+    },
+    "ddIS": 2353,
+    "ddOOS": 4787
+   },
+   "fade_med_OOS": -4871,
+   "fade_best": {
+    "strategy": "FADE S=14 F=19 buf 30% always | TIME 4h WF | STOP | entries any hour",
+    "IS": -377,
+    "OOS": -1994,
+    "trades_IS": 4776,
+    "trades_OOS": 3533,
+    "fin_total": 348,
+    "by_year_worst_fb": {
+     "2019": -441,
+     "2020": 1602,
+     "2021": -1021,
+     "2022": -489,
+     "2023": -126,
+     "2024": -906,
+     "2025": -839,
+     "2026": 19
+    },
+    "ddIS": 5885,
+    "ddOOS": 3264
+   }
+  },
+  "TIME 8h | HOLD | 1-hour window": {
+   "n": 50259,
+   "med_IS": -239,
+   "med_OOS": -255,
+   "share_OOS_pos": 0.384,
+   "spearman": 0.031,
+   "best": {
+    "strategy": "S=00 F=09 buf 11% overnight | TIME 8h WF | HOLD | entries 11:00 only",
+    "IS": 1903,
+    "OOS": -1768,
+    "trades_IS": 810,
+    "trades_OOS": 678,
+    "fin_total": 12,
+    "by_year_worst_fb": {
+     "2019": 155,
+     "2020": 282,
+     "2021": 625,
+     "2022": 798,
+     "2023": -888,
+     "2024": -322,
+     "2025": -866,
+     "2026": 283
+    },
+    "ddIS": 414,
+    "ddOOS": 2126
+   },
+   "fade_med_OOS": -610,
+   "fade_best": {
+    "strategy": "FADE S=00 F=11 buf 11% overnight | TIME 8h WF | HOLD | entries 12:00 only",
+    "IS": 1673,
+    "OOS": 847,
+    "trades_IS": 829,
+    "trades_OOS": 693,
+    "fin_total": 15,
+    "by_year_worst_fb": {
+     "2019": 63,
+     "2020": 84,
+     "2021": 352,
+     "2022": 971,
+     "2023": 28,
+     "2024": -465,
+     "2025": 731,
+     "2026": 483
+    },
+    "ddIS": 3270,
+    "ddOOS": 2083
+   }
+  },
+  "TIME 8h | HOLD | any hour": {
+   "n": 2112,
+   "med_IS": -1229,
+   "med_OOS": -929,
+   "share_OOS_pos": 0.176,
+   "spearman": 0.155,
+   "best": {
+    "strategy": "S=22 F=14 buf 30% overnight | TIME 8h WF | HOLD | entries any hour",
+    "IS": 1752,
+    "OOS": -1605,
+    "trades_IS": 2925,
+    "trades_OOS": 2317,
+    "fin_total": 462,
+    "by_year_worst_fb": {
+     "2019": -259,
+     "2020": 1153,
+     "2021": 325,
+     "2022": 519,
+     "2023": -1018,
+     "2024": -393,
+     "2025": -242,
+     "2026": -26
+    },
+    "ddIS": 870,
+    "ddOOS": 1820
+   },
+   "fade_med_OOS": -2259,
+   "fade_best": {
+    "strategy": "FADE S=15 F=16 buf 30% always | TIME 8h WF | HOLD | entries any hour",
+    "IS": 1230,
+    "OOS": -1291,
+    "trades_IS": 2745,
+    "trades_OOS": 2062,
+    "fin_total": 510,
+    "by_year_worst_fb": {
+     "2019": -442,
+     "2020": 1180,
+     "2021": 40,
+     "2022": 611,
+     "2023": -837,
+     "2024": -164,
+     "2025": -475,
+     "2026": 331
+    },
+    "ddIS": 5225,
+    "ddOOS": 1739
+   }
+  },
+  "TIME 8h | SAR | 1-hour window": {
+   "n": 50259,
+   "med_IS": -287,
+   "med_OOS": -151,
+   "share_OOS_pos": 0.359,
+   "spearman": 0.109,
+   "best": {
+    "strategy": "S=13 F=13 buf 11% overnight | TIME 8h WF | SAR | entries 09:00 only",
+    "IS": 1186,
+    "OOS": 119,
+    "trades_IS": 891,
+    "trades_OOS": 694,
+    "fin_total": 2,
+    "by_year_worst_fb": {
+     "2019": 202,
+     "2020": 123,
+     "2021": 249,
+     "2022": 611,
+     "2023": 328,
+     "2024": 98,
+     "2025": -123,
+     "2026": -184
+    },
+    "ddIS": 397,
+    "ddOOS": 623
+   },
+   "fade_med_OOS": -671,
+   "fade_best": {
+    "strategy": "FADE S=15 F=19 buf 30% overnight | TIME 8h WF | SAR | entries 07:00 only",
+    "IS": 1076,
+    "OOS": 273,
+    "trades_IS": 685,
+    "trades_OOS": 476,
+    "fin_total": 0,
+    "by_year_worst_fb": {
+     "2019": -328,
+     "2020": 542,
+     "2021": 85,
+     "2022": 777,
+     "2023": 95,
+     "2024": -280,
+     "2025": -17,
+     "2026": 475
+    },
+    "ddIS": 2088,
+    "ddOOS": 1203
+   }
+  },
+  "TIME 8h | SAR | any hour": {
+   "n": 2112,
+   "med_IS": -12364,
+   "med_OOS": -10150,
+   "share_OOS_pos": 0.0,
+   "spearman": 0.911,
+   "best": {
+    "strategy": "S=15 F=15 buf 30% always | TIME 8h WF | SAR | entries any hour",
+    "IS": -2693,
+    "OOS": -3120,
+    "trades_IS": 3147,
+    "trades_OOS": 2410,
+    "fin_total": 511,
+    "by_year_worst_fb": {
+     "2019": -502,
+     "2020": -1925,
+     "2021": -506,
+     "2022": 239,
+     "2023": -745,
+     "2024": -1006,
+     "2025": -777,
+     "2026": -592
+    },
+    "ddIS": 3250,
+    "ddOOS": 3371
+   },
+   "fade_med_OOS": -5163,
+   "fade_best": {
+    "strategy": "FADE S=13 F=19 buf 30% always | TIME 8h WF | SAR | entries any hour",
+    "IS": 519,
+    "OOS": -2969,
+    "trades_IS": 4206,
+    "trades_OOS": 3149,
+    "fin_total": 494,
+    "by_year_worst_fb": {
+     "2019": -363,
+     "2020": 1358,
+     "2021": -266,
+     "2022": -84,
+     "2023": -228,
+     "2024": -950,
+     "2025": -1825,
+     "2026": 252
+    },
+    "ddIS": 8765,
+    "ddOOS": 3746
+   }
+  },
+  "TIME 8h | STOP | 1-hour window": {
+   "n": 50259,
+   "med_IS": -166,
+   "med_OOS": -32,
+   "share_OOS_pos": 0.457,
+   "spearman": 0.122,
+   "best": {
+    "strategy": "S=13 F=13 buf 11% overnight | TIME 8h WF | STOP | entries 09:00 only",
+    "IS": 1209,
+    "OOS": 165,
+    "trades_IS": 887,
+    "trades_OOS": 691,
+    "fin_total": 2,
+    "by_year_worst_fb": {
+     "2019": 202,
+     "2020": 123,
+     "2021": 261,
+     "2022": 623,
+     "2023": 337,
+     "2024": 118,
+     "2025": -123,
+     "2026": -166
+    },
+    "ddIS": 397,
+    "ddOOS": 604
+   },
+   "fade_med_OOS": -663,
+   "fade_best": {
+    "strategy": "FADE S=15 F=19 buf 30% overnight | TIME 8h WF | STOP | entries 07:00 only",
+    "IS": 1057,
+    "OOS": 273,
+    "trades_IS": 679,
+    "trades_OOS": 476,
+    "fin_total": 0,
+    "by_year_worst_fb": {
+     "2019": -295,
+     "2020": 513,
+     "2021": 74,
+     "2022": 764,
+     "2023": 95,
+     "2024": -280,
+     "2025": -17,
+     "2026": 475
+    },
+    "ddIS": 2032,
+    "ddOOS": 1203
+   }
+  },
+  "TIME 8h | STOP | any hour": {
+   "n": 2112,
+   "med_IS": -5337,
+   "med_OOS": -4110,
+   "share_OOS_pos": 0.0,
+   "spearman": 0.717,
+   "best": {
+    "strategy": "S=08 F=08 no buffer | TIME 8h WF | STOP | entries any hour",
+    "IS": -1493,
+    "OOS": -3470,
+    "trades_IS": 4254,
+    "trades_OOS": 3633,
+    "fin_total": 504,
+    "by_year_worst_fb": {
+     "2019": -627,
+     "2020": -1133,
+     "2021": 33,
+     "2022": 234,
+     "2023": -1394,
+     "2024": -705,
+     "2025": -1029,
+     "2026": -343
+    },
+    "ddIS": 2070,
+    "ddOOS": 3566
+   },
+   "fade_med_OOS": -3954,
+   "fade_best": {
+    "strategy": "FADE S=13 F=20 buf 30% always | TIME 8h WF | STOP | entries any hour",
+    "IS": 733,
+    "OOS": -2596,
+    "trades_IS": 3704,
+    "trades_OOS": 2734,
+    "fin_total": 376,
+    "by_year_worst_fb": {
+     "2019": -210,
+     "2020": 1829,
+     "2021": -337,
+     "2022": -400,
+     "2023": -506,
+     "2024": -1128,
+     "2025": -1055,
+     "2026": 185
+    },
+    "ddIS": 6869,
+    "ddOOS": 1625
+   }
+  },
+  "WEEK | HOLD": {
+   "n": 247986,
+   "med_IS": -238,
+   "med_OOS": -263,
+   "share_OOS_pos": 0.366,
+   "spearman": 0.17,
+   "best": {
+    "strategy": "S=00 F=08 buf 30% always | WEEK Mon 10:00 | HOLD",
+    "IS": 3428,
+    "OOS": 1375,
+    "trades_IS": 209,
+    "trades_OOS": 165,
+    "fin_total": 551,
+    "by_year_worst_fb": {
+     "2019": 138,
+     "2020": 2017,
+     "2021": 217,
+     "2022": 1055,
+     "2023": 1210,
+     "2024": 4,
+     "2025": 10,
+     "2026": 151
+    },
+    "ddIS": 1440,
+    "ddOOS": 1524
+   },
+   "fade_med_OOS": -264,
+   "fade_best": {
+    "strategy": "FADE S=09 F=18 buf 30% overnight | WEEK Thu 00:00 | HOLD",
+    "IS": 3832,
+    "OOS": 836,
+    "trades_IS": 209,
+    "trades_OOS": 165,
+    "fin_total": 166,
+    "by_year_worst_fb": {
+     "2019": 305,
+     "2020": 793,
+     "2021": 878,
+     "2022": 1927,
+     "2023": 167,
+     "2024": 103,
+     "2025": 594,
+     "2026": 36
+    },
+    "ddIS": 4229,
+    "ddOOS": 1237
+   }
+  },
+  "WEEK | SAR": {
+   "n": 248819,
+   "med_IS": -6061,
+   "med_OOS": -4227,
+   "share_OOS_pos": 0.02,
+   "spearman": 0.949,
+   "best": {
+    "strategy": "S=13 F=14 buf 30% always | WEEK Thu 17:00 | SAR",
+    "IS": 890,
+    "OOS": 466,
+    "trades_IS": 521,
+    "trades_OOS": 396,
+    "fin_total": 139,
+    "by_year_worst_fb": {
+     "2019": -33,
+     "2020": -292,
+     "2021": 8,
+     "2022": 1119,
+     "2023": 354,
+     "2024": 116,
+     "2025": 305,
+     "2026": -322
+    },
+    "ddIS": 810,
+    "ddOOS": 606
+   },
+   "fade_med_OOS": -2825,
+   "fade_best": {
+    "strategy": "FADE S=17 F=19 buf 11% overnight | WEEK Tue 14:00 | SAR",
+    "IS": 1756,
+    "OOS": -960,
+    "trades_IS": 2397,
+    "trades_OOS": 1803,
+    "fin_total": 423,
+    "by_year_worst_fb": {
+     "2019": -277,
+     "2020": 1408,
+     "2021": -559,
+     "2022": 885,
+     "2023": -176,
+     "2024": -1084,
+     "2025": 113,
+     "2026": 360
+    },
+    "ddIS": 9532,
+    "ddOOS": 5358
+   }
+  },
+  "WEEK | STOP": {
+   "n": 247986,
+   "med_IS": -31,
+   "med_OOS": -22,
+   "share_OOS_pos": 0.452,
+   "spearman": 0.005,
+   "best": {
+    "strategy": "S=14 F=14 buf 30% overnight | WEEK Thu 19:00 | STOP",
+    "IS": 1275,
+    "OOS": 344,
+    "trades_IS": 207,
+    "trades_OOS": 164,
+    "fin_total": 85,
+    "by_year_worst_fb": {
+     "2019": 176,
+     "2020": -170,
+     "2021": 291,
+     "2022": 979,
+     "2023": 376,
+     "2024": 127,
+     "2025": -19,
+     "2026": -140
+    },
+    "ddIS": 455,
+    "ddOOS": 453
+   },
+   "fade_med_OOS": -158,
+   "fade_best": {
+    "strategy": "FADE S=15 F=18 buf 30% always | WEEK Thu 07:00 | STOP",
+    "IS": 1288,
+    "OOS": 677,
+    "trades_IS": 209,
+    "trades_OOS": 165,
+    "fin_total": 22,
+    "by_year_worst_fb": {
+     "2019": 92,
+     "2020": 334,
+     "2021": 395,
+     "2022": 472,
+     "2023": -112,
+     "2024": 14,
+     "2025": 678,
+     "2026": 100
+    },
+    "ddIS": 1555,
+    "ddOOS": 990
+   }
+  }
+ },
+ "top50_by_IS": [
+  {
+   "strategy": "FADE S=08 F=18 buf 30% overnight | DAY R=06 WF | HOLD | entries any hour",
+   "IS": 4552,
+   "OOS": 2102,
+   "trades_IS": 1230,
+   "trades_OOS": 952,
+   "fin_total": 558,
+   "by_year_worst_fb": {
+    "2019": -33,
+    "2020": 1471,
+    "2021": 335,
+    "2022": 2914,
+    "2023": -195,
+    "2024": -467,
+    "2025": 2456,
+    "2026": 406
+   },
+   "ddIS": 6582,
+   "ddOOS": 4097
+  },
+  {
+   "strategy": "FADE S=08 F=18 buf 30% overnight | DAY R=06 WF | HOLD | entries 06:00+4h",
+   "IS": 4503,
+   "OOS": 2581,
+   "trades_IS": 1031,
+   "trades_OOS": 815,
+   "fin_total": 558,
+   "by_year_worst_fb": {
+    "2019": 25,
+    "2020": 1383,
+    "2021": 301,
+    "2022": 2926,
+    "2023": -39,
+    "2024": -359,
+    "2025": 2636,
+    "2026": 439
+   },
+   "ddIS": 6263,
+   "ddOOS": 4375
+  },
+  {
+   "strategy": "FADE S=14 F=18 buf 30% always | DAY R=06 WF | HOLD | entries any hour",
+   "IS": 4452,
+   "OOS": 2454,
+   "trades_IS": 1230,
+   "trades_OOS": 951,
+   "fin_total": 564,
+   "by_year_worst_fb": {
+    "2019": -48,
+    "2020": 1576,
+    "2021": -14,
+    "2022": 3153,
+    "2023": -318,
+    "2024": -332,
+    "2025": 2665,
+    "2026": 641
+   },
+   "ddIS": 6451,
+   "ddOOS": 4430
+  },
+  {
+   "strategy": "FADE S=08 F=18 buf 30% overnight | DAY R=04 WF | HOLD | entries any hour",
+   "IS": 4403,
+   "OOS": 1985,
+   "trades_IS": 1227,
+   "trades_OOS": 948,
+   "fin_total": 553,
+   "by_year_worst_fb": {
+    "2019": -221,
+    "2020": 1364,
+    "2021": 370,
+    "2022": 3079,
+    "2023": 68,
+    "2024": -605,
+    "2025": 2142,
+    "2026": 514
+   },
+   "ddIS": 6479,
+   "ddOOS": 3915
+  },
+  {
+   "strategy": "FADE S=08 F=18 buf 30% always | DAY R=06 WF | HOLD | entries any hour",
+   "IS": 4385,
+   "OOS": 3038,
+   "trades_IS": 1230,
+   "trades_OOS": 952,
+   "fin_total": 560,
+   "by_year_worst_fb": {
+    "2019": -165,
+    "2020": 1404,
+    "2021": 152,
+    "2022": 3175,
+    "2023": 321,
+    "2024": -335,
+    "2025": 2705,
+    "2026": 450
+   },
+   "ddIS": 6298,
+   "ddOOS": 4744
+  },
+  {
+   "strategy": "FADE S=08 F=18 buf 30% overnight | DAY R=05 WF | HOLD | entries any hour",
+   "IS": 4371,
+   "OOS": 2418,
+   "trades_IS": 1227,
+   "trades_OOS": 949,
+   "fin_total": 555,
+   "by_year_worst_fb": {
+    "2019": -141,
+    "2020": 1314,
+    "2021": 213,
+    "2022": 3176,
+    "2023": 3,
+    "2024": -505,
+    "2025": 2509,
+    "2026": 548
+   },
+   "ddIS": 6434,
+   "ddOOS": 4373
+  },
+  {
+   "strategy": "FADE S=08 F=18 buf 30% always | DAY R=06 WF | HOLD | entries 06:00+4h",
+   "IS": 4349,
+   "OOS": 3586,
+   "trades_IS": 1000,
+   "trades_OOS": 786,
+   "fin_total": 542,
+   "by_year_worst_fb": {
+    "2019": -134,
+    "2020": 1405,
+    "2021": 144,
+    "2022": 3062,
+    "2023": 568,
+    "2024": -101,
+    "2025": 2750,
+    "2026": 519
+   },
+   "ddIS": 6008,
+   "ddOOS": 5058
+  },
+  {
+   "strategy": "FADE S=13 F=18 buf 30% overnight | DAY R=06 WF | HOLD | entries any hour",
+   "IS": 4289,
+   "OOS": 3056,
+   "trades_IS": 1230,
+   "trades_OOS": 952,
+   "fin_total": 561,
+   "by_year_worst_fb": {
+    "2019": -254,
+    "2020": 1707,
+    "2021": -126,
+    "2022": 3174,
+    "2023": -267,
+    "2024": 128,
+    "2025": 2715,
+    "2026": 616
+   },
+   "ddIS": 6287,
+   "ddOOS": 5076
+  },
+  {
+   "strategy": "FADE S=08 F=18 buf 30% always | DAY R=05 WF | HOLD | entries any hour",
+   "IS": 4266,
+   "OOS": 3192,
+   "trades_IS": 1227,
+   "trades_OOS": 949,
+   "fin_total": 556,
+   "by_year_worst_fb": {
+    "2019": -228,
+    "2020": 1368,
+    "2021": 98,
+    "2022": 3218,
+    "2023": 362,
+    "2024": -375,
+    "2025": 2725,
+    "2026": 589
+   },
+   "ddIS": 6148,
+   "ddOOS": 4896
+  },
+  {
+   "strategy": "FADE S=08 F=18 buf 30% always | DAY R=04 WF | HOLD | entries any hour",
+   "IS": 4258,
+   "OOS": 2794,
+   "trades_IS": 1227,
+   "trades_OOS": 948,
+   "fin_total": 554,
+   "by_year_worst_fb": {
+    "2019": -327,
+    "2020": 1410,
+    "2021": 247,
+    "2022": 3116,
+    "2023": 408,
+    "2024": -409,
+    "2025": 2351,
+    "2026": 555
+   },
+   "ddIS": 6139,
+   "ddOOS": 4480
+  },
+  {
+   "strategy": "FADE S=15 F=18 buf 30% overnight | DAY R=06 WF | HOLD | entries any hour",
+   "IS": 4207,
+   "OOS": 2250,
+   "trades_IS": 1230,
+   "trades_OOS": 952,
+   "fin_total": 574,
+   "by_year_worst_fb": {
+    "2019": -72,
+    "2020": 1358,
+    "2021": -50,
+    "2022": 3185,
+    "2023": -451,
+    "2024": -365,
+    "2025": 2611,
+    "2026": 645
+   },
+   "ddIS": 6120,
+   "ddOOS": 4285
+  },
+  {
+   "strategy": "FADE S=14 F=18 buf 30% always | DAY R=05 WF | HOLD | entries any hour",
+   "IS": 4200,
+   "OOS": 2500,
+   "trades_IS": 1227,
+   "trades_OOS": 948,
+   "fin_total": 561,
+   "by_year_worst_fb": {
+    "2019": -154,
+    "2020": 1548,
+    "2021": -84,
+    "2022": 3105,
+    "2023": -159,
+    "2024": -413,
+    "2025": 2648,
+    "2026": 630
+   },
+   "ddIS": 6140,
+   "ddOOS": 4388
+  },
+  {
+   "strategy": "FADE S=08 F=18 buf 30% overnight | DAY R=05 WF | HOLD | entries 05:00+4h",
+   "IS": 4170,
+   "OOS": 2840,
+   "trades_IS": 1009,
+   "trades_OOS": 805,
+   "fin_total": 548,
+   "by_year_worst_fb": {
+    "2019": -107,
+    "2020": 1209,
+    "2021": 135,
+    "2022": 3121,
+    "2023": 124,
+    "2024": -358,
+    "2025": 2739,
+    "2026": 471
+   },
+   "ddIS": 5956,
+   "ddOOS": 4668
+  },
+  {
+   "strategy": "FADE S=13 F=18 buf 30% always | DAY R=06 WF | HOLD | entries any hour",
+   "IS": 4154,
+   "OOS": 2947,
+   "trades_IS": 1230,
+   "trades_OOS": 952,
+   "fin_total": 567,
+   "by_year_worst_fb": {
+    "2019": -157,
+    "2020": 1598,
+    "2021": -91,
+    "2022": 3018,
+    "2023": -135,
+    "2024": -134,
+    "2025": 2752,
+    "2026": 634
+   },
+   "ddIS": 6057,
+   "ddOOS": 4809
+  },
+  {
+   "strategy": "FADE S=14 F=18 buf 30% always | DAY R=07 WF | HOLD | entries any hour",
+   "IS": 4152,
+   "OOS": 2814,
+   "trades_IS": 1230,
+   "trades_OOS": 954,
+   "fin_total": 569,
+   "by_year_worst_fb": {
+    "2019": -60,
+    "2020": 1237,
+    "2021": 93,
+    "2022": 3085,
+    "2023": -161,
+    "2024": -296,
+    "2025": 2729,
+    "2026": 736
+   },
+   "ddIS": 6055,
+   "ddOOS": 4638
+  },
+  {
+   "strategy": "FADE S=14 F=18 buf 30% always | DAY R=04 WF | HOLD | entries any hour",
+   "IS": 4137,
+   "OOS": 2066,
+   "trades_IS": 1227,
+   "trades_OOS": 947,
+   "fin_total": 558,
+   "by_year_worst_fb": {
+    "2019": -257,
+    "2020": 1590,
+    "2021": 62,
+    "2022": 2955,
+    "2023": -139,
+    "2024": -421,
+    "2025": 2235,
+    "2026": 599
+   },
+   "ddIS": 6080,
+   "ddOOS": 3975
+  },
+  {
+   "strategy": "FADE S=08 F=18 buf 11% overnight | DAY R=07 WF | HOLD | entries any hour",
+   "IS": 4125,
+   "OOS": 2867,
+   "trades_IS": 1237,
+   "trades_OOS": 968,
+   "fin_total": 572,
+   "by_year_worst_fb": {
+    "2019": 50,
+    "2020": 997,
+    "2021": 451,
+    "2022": 2839,
+    "2023": 211,
+    "2024": -419,
+    "2025": 2703,
+    "2026": 464
+   },
+   "ddIS": 6338,
+   "ddOOS": 4793
+  },
+  {
+   "strategy": "FADE S=09 F=18 buf 30% always | DAY R=06 WF | HOLD | entries 06:00+4h",
+   "IS": 4102,
+   "OOS": 3067,
+   "trades_IS": 973,
+   "trades_OOS": 724,
+   "fin_total": 516,
+   "by_year_worst_fb": {
+    "2019": -134,
+    "2020": 1442,
+    "2021": 99,
+    "2022": 2896,
+    "2023": 112,
+    "2024": -109,
+    "2025": 2581,
+    "2026": 669
+   },
+   "ddIS": 5764,
+   "ddOOS": 4489
+  },
+  {
+   "strategy": "FADE S=08 F=18 buf 30% always | DAY R=07 WF | HOLD | entries any hour",
+   "IS": 4085,
+   "OOS": 3236,
+   "trades_IS": 1230,
+   "trades_OOS": 955,
+   "fin_total": 564,
+   "by_year_worst_fb": {
+    "2019": -231,
+    "2020": 956,
+    "2021": 410,
+    "2022": 3164,
+    "2023": 306,
+    "2024": -264,
+    "2025": 2771,
+    "2026": 521
+   },
+   "ddIS": 6157,
+   "ddOOS": 5002
+  },
+  {
+   "strategy": "FADE S=14 F=18 buf 30% overnight | DAY R=06 WF | HOLD | entries any hour",
+   "IS": 4080,
+   "OOS": 2818,
+   "trades_IS": 1230,
+   "trades_OOS": 952,
+   "fin_total": 568,
+   "by_year_worst_fb": {
+    "2019": -71,
+    "2020": 1326,
+    "2021": -63,
+    "2022": 3072,
+    "2023": -393,
+    "2024": -128,
+    "2025": 2903,
+    "2026": 636
+   },
+   "ddIS": 6055,
+   "ddOOS": 4830
+  },
+  {
+   "strategy": "FADE S=16 F=18 buf 30% always | DAY R=06 WF | HOLD | entries any hour",
+   "IS": 4075,
+   "OOS": 2417,
+   "trades_IS": 1229,
+   "trades_OOS": 951,
+   "fin_total": 572,
+   "by_year_worst_fb": {
+    "2019": -116,
+    "2020": 1539,
+    "2021": -16,
+    "2022": 2882,
+    "2023": -396,
+    "2024": -289,
+    "2025": 2648,
+    "2026": 645
+   },
+   "ddIS": 5952,
+   "ddOOS": 4418
+  },
+  {
+   "strategy": "FADE S=09 F=18 buf 30% overnight | DAY R=06 WF | HOLD | entries 06:00+4h",
+   "IS": 4057,
+   "OOS": 2595,
+   "trades_IS": 1006,
+   "trades_OOS": 785,
+   "fin_total": 556,
+   "by_year_worst_fb": {
+    "2019": -124,
+    "2020": 1428,
+    "2021": 121,
+    "2022": 2837,
+    "2023": 214,
+    "2024": -318,
+    "2025": 2444,
+    "2026": 443
+   },
+   "ddIS": 5718,
+   "ddOOS": 4184
+  },
+  {
+   "strategy": "FADE S=15 F=18 buf 30% overnight | DAY R=05 WF | HOLD | entries any hour",
+   "IS": 4040,
+   "OOS": 2289,
+   "trades_IS": 1227,
+   "trades_OOS": 949,
+   "fin_total": 571,
+   "by_year_worst_fb": {
+    "2019": -192,
+    "2020": 1365,
+    "2021": -110,
+    "2022": 3189,
+    "2023": -293,
+    "2024": -441,
+    "2025": 2584,
+    "2026": 634
+   },
+   "ddIS": 5934,
+   "ddOOS": 4232
+  },
+  {
+   "strategy": "FADE S=15 F=18 buf 30% always | DAY R=06 WF | HOLD | entries any hour",
+   "IS": 4025,
+   "OOS": 2360,
+   "trades_IS": 1230,
+   "trades_OOS": 951,
+   "fin_total": 572,
+   "by_year_worst_fb": {
+    "2019": -171,
+    "2020": 1564,
+    "2021": -27,
+    "2022": 2872,
+    "2023": -431,
+    "2024": -313,
+    "2025": 2652,
+    "2026": 645
+   },
+   "ddIS": 5925,
+   "ddOOS": 4382
+  },
+  {
+   "strategy": "FADE S=17 F=18 buf 30% always | DAY R=06 WF | HOLD | entries 06:00+4h",
+   "IS": 4007,
+   "OOS": 3113,
+   "trades_IS": 927,
+   "trades_OOS": 665,
+   "fin_total": 483,
+   "by_year_worst_fb": {
+    "2019": -88,
+    "2020": 1423,
+    "2021": 14,
+    "2022": 2847,
+    "2023": 49,
+    "2024": -96,
+    "2025": 2774,
+    "2026": 552
+   },
+   "ddIS": 5554,
+   "ddOOS": 4571
+  },
+  {
+   "strategy": "FADE S=08 F=18 buf 11% overnight | DAY R=07 WF | HOLD | entries 07:00+4h",
+   "IS": 4002,
+   "OOS": 3356,
+   "trades_IS": 1032,
+   "trades_OOS": 817,
+   "fin_total": 571,
+   "by_year_worst_fb": {
+    "2019": 87,
+    "2020": 951,
+    "2021": 389,
+    "2022": 2787,
+    "2023": 294,
+    "2024": -373,
+    "2025": 3002,
+    "2026": 526
+   },
+   "ddIS": 6013,
+   "ddOOS": 5105
+  },
+  {
+   "strategy": "FADE S=08 F=18 buf 30% always | DAY R=07 WF | HOLD | entries 07:00+4h",
+   "IS": 3976,
+   "OOS": 3751,
+   "trades_IS": 1015,
+   "trades_OOS": 803,
+   "fin_total": 553,
+   "by_year_worst_fb": {
+    "2019": -178,
+    "2020": 912,
+    "2021": 390,
+    "2022": 3063,
+    "2023": 430,
+    "2024": -207,
+    "2025": 3080,
+    "2026": 596
+   },
+   "ddIS": 5904,
+   "ddOOS": 5306
+  },
+  {
+   "strategy": "S=23 F=19 buf 11% overnight | DAY R=22 WF | HOLD | entries any hour",
+   "IS": 3934,
+   "OOS": 701,
+   "trades_IS": 1035,
+   "trades_OOS": 819,
+   "fin_total": 520,
+   "by_year_worst_fb": {
+    "2019": -334,
+    "2020": 1021,
+    "2021": 310,
+    "2022": 2621,
+    "2023": -536,
+    "2024": 881,
+    "2025": 26,
+    "2026": 229
+   },
+   "ddIS": 633,
+   "ddOOS": 1017
+  },
+  {
+   "strategy": "FADE S=12 F=18 buf 30% always | DAY R=06 WF | HOLD | entries any hour",
+   "IS": 3926,
+   "OOS": 2753,
+   "trades_IS": 1230,
+   "trades_OOS": 952,
+   "fin_total": 561,
+   "by_year_worst_fb": {
+    "2019": -280,
+    "2020": 1143,
+    "2021": 54,
+    "2022": 3141,
+    "2023": -279,
+    "2024": -307,
+    "2025": 2825,
+    "2026": 719
+   },
+   "ddIS": 5903,
+   "ddOOS": 4903
+  },
+  {
+   "strategy": "FADE S=14 F=16 buf 30% overnight | DAY R=07 WF | HOLD | entries any hour",
+   "IS": 3926,
+   "OOS": 1130,
+   "trades_IS": 1219,
+   "trades_OOS": 943,
+   "fin_total": 568,
+   "by_year_worst_fb": {
+    "2019": -195,
+    "2020": 1982,
+    "2021": 784,
+    "2022": 1558,
+    "2023": -482,
+    "2024": 638,
+    "2025": 1116,
+    "2026": 52
+   },
+   "ddIS": 5947,
+   "ddOOS": 3207
+  },
+  {
+   "strategy": "FADE S=08 F=18 buf 30% overnight | DAY R=07 WF | HOLD | entries any hour",
+   "IS": 3920,
+   "OOS": 2277,
+   "trades_IS": 1230,
+   "trades_OOS": 955,
+   "fin_total": 560,
+   "by_year_worst_fb": {
+    "2019": -102,
+    "2020": 888,
+    "2021": 568,
+    "2022": 2782,
+    "2023": -243,
+    "2024": -407,
+    "2025": 2560,
+    "2026": 465
+   },
+   "ddIS": 6243,
+   "ddOOS": 4448
+  },
+  {
+   "strategy": "FADE S=11 F=18 buf 30% overnight | DAY R=06 WF | HOLD | entries any hour",
+   "IS": 3917,
+   "OOS": 3394,
+   "trades_IS": 1230,
+   "trades_OOS": 952,
+   "fin_total": 561,
+   "by_year_worst_fb": {
+    "2019": -151,
+    "2020": 1485,
+    "2021": -194,
+    "2022": 2974,
+    "2023": 6,
+    "2024": 75,
+    "2025": 2740,
+    "2026": 777
+   },
+   "ddIS": 5914,
+   "ddOOS": 5491
+  },
+  {
+   "strategy": "FADE S=14 F=16 buf 30% always | DAY R=07 WF | HOLD | entries any hour",
+   "IS": 3906,
+   "OOS": 916,
+   "trades_IS": 1219,
+   "trades_OOS": 943,
+   "fin_total": 566,
+   "by_year_worst_fb": {
+    "2019": -162,
+    "2020": 1942,
+    "2021": 822,
+    "2022": 1447,
+    "2023": -451,
+    "2024": 345,
+    "2025": 1158,
+    "2026": 59
+   },
+   "ddIS": 5850,
+   "ddOOS": 2972
+  },
+  {
+   "strategy": "S=23 F=19 buf 11% overnight | DAY R=22 WF | HOLD | entries 22:00+4h",
+   "IS": 3904,
+   "OOS": 825,
+   "trades_IS": 1025,
+   "trades_OOS": 812,
+   "fin_total": 516,
+   "by_year_worst_fb": {
+    "2019": -333,
+    "2020": 929,
+    "2021": 309,
+    "2022": 2684,
+    "2023": -572,
+    "2024": 869,
+    "2025": 198,
+    "2026": 229
+   },
+   "ddIS": 633,
+   "ddOOS": 1017
+  },
+  {
+   "strategy": "FADE S=12 F=18 buf 30% overnight | DAY R=06 WF | HOLD | entries any hour",
+   "IS": 3901,
+   "OOS": 2460,
+   "trades_IS": 1230,
+   "trades_OOS": 952,
+   "fin_total": 551,
+   "by_year_worst_fb": {
+    "2019": -324,
+    "2020": 1307,
+    "2021": -28,
+    "2022": 3101,
+    "2023": -64,
+    "2024": -449,
+    "2025": 2480,
+    "2026": 627
+   },
+   "ddIS": 5846,
+   "ddOOS": 4472
+  },
+  {
+   "strategy": "FADE S=18 F=18 buf 30% always | DAY R=06 WF | HOLD | entries any hour",
+   "IS": 3900,
+   "OOS": 2404,
+   "trades_IS": 1228,
+   "trades_OOS": 951,
+   "fin_total": 573,
+   "by_year_worst_fb": {
+    "2019": -43,
+    "2020": 1309,
+    "2021": -119,
+    "2022": 2965,
+    "2023": -392,
+    "2024": -342,
+    "2025": 2682,
+    "2026": 645
+   },
+   "ddIS": 5766,
+   "ddOOS": 4399
+  },
+  {
+   "strategy": "FADE S=08 F=18 buf 11% overnight | DAY R=06 WF | HOLD | entries any hour",
+   "IS": 3897,
+   "OOS": 2208,
+   "trades_IS": 1237,
+   "trades_OOS": 963,
+   "fin_total": 568,
+   "by_year_worst_fb": {
+    "2019": 14,
+    "2020": 1517,
+    "2021": 103,
+    "2022": 2423,
+    "2023": -12,
+    "2024": -203,
+    "2025": 2208,
+    "2026": 299
+   },
+   "ddIS": 5928,
+   "ddOOS": 4236
+  },
+  {
+   "strategy": "FADE S=08 F=18 buf 30% always | DAY R=05 WF | HOLD | entries 05:00+4h",
+   "IS": 3897,
+   "OOS": 3653,
+   "trades_IS": 968,
+   "trades_OOS": 750,
+   "fin_total": 514,
+   "by_year_worst_fb": {
+    "2019": -226,
+    "2020": 1186,
+    "2021": 89,
+    "2022": 3026,
+    "2023": 386,
+    "2024": -1,
+    "2025": 2911,
+    "2026": 503
+   },
+   "ddIS": 5573,
+   "ddOOS": 5157
+  },
+  {
+   "strategy": "FADE S=16 F=18 buf 30% always | DAY R=05 WF | HOLD | entries any hour",
+   "IS": 3886,
+   "OOS": 2438,
+   "trades_IS": 1226,
+   "trades_OOS": 948,
+   "fin_total": 569,
+   "by_year_worst_fb": {
+    "2019": -238,
+    "2020": 1537,
+    "2021": -76,
+    "2022": 2874,
+    "2023": -249,
+    "2024": -372,
+    "2025": 2621,
+    "2026": 634
+   },
+   "ddIS": 5742,
+   "ddOOS": 4364
+  },
+  {
+   "strategy": "FADE S=16 F=18 buf 30% overnight | DAY R=06 WF | HOLD | entries any hour",
+   "IS": 3884,
+   "OOS": 2427,
+   "trades_IS": 1230,
+   "trades_OOS": 952,
+   "fin_total": 568,
+   "by_year_worst_fb": {
+    "2019": -129,
+    "2020": 1323,
+    "2021": -33,
+    "2022": 2936,
+    "2023": -447,
+    "2024": -203,
+    "2025": 2627,
+    "2026": 645
+   },
+   "ddIS": 5977,
+   "ddOOS": 4464
+  },
+  {
+   "strategy": "FADE S=08 F=18 no buffer | DAY R=06 WF | HOLD | entries any hour",
+   "IS": 3871,
+   "OOS": 2259,
+   "trades_IS": 1238,
+   "trades_OOS": 972,
+   "fin_total": 568,
+   "by_year_worst_fb": {
+    "2019": -122,
+    "2020": 1726,
+    "2021": 147,
+    "2022": 2278,
+    "2023": 118,
+    "2024": -313,
+    "2025": 2417,
+    "2026": 235
+   },
+   "ddIS": 5696,
+   "ddOOS": 4280
+  },
+  {
+   "strategy": "FADE S=13 F=18 buf 30% always | DAY R=05 WF | HOLD | entries any hour",
+   "IS": 3869,
+   "OOS": 3006,
+   "trades_IS": 1227,
+   "trades_OOS": 949,
+   "fin_total": 564,
+   "by_year_worst_fb": {
+    "2019": -252,
+    "2020": 1527,
+    "2021": -152,
+    "2022": 2960,
+    "2023": 27,
+    "2024": -205,
+    "2025": 2737,
+    "2026": 622
+   },
+   "ddIS": 5729,
+   "ddOOS": 4831
+  },
+  {
+   "strategy": "FADE S=13 F=18 buf 30% always | DAY R=07 WF | HOLD | entries any hour",
+   "IS": 3869,
+   "OOS": 3308,
+   "trades_IS": 1230,
+   "trades_OOS": 955,
+   "fin_total": 572,
+   "by_year_worst_fb": {
+    "2019": -160,
+    "2020": 1207,
+    "2021": 73,
+    "2022": 2964,
+    "2023": -4,
+    "2024": -91,
+    "2025": 2848,
+    "2026": 725
+   },
+   "ddIS": 5850,
+   "ddOOS": 5118
+  },
+  {
+   "strategy": "FADE S=15 F=18 buf 30% always | DAY R=05 WF | HOLD | entries any hour",
+   "IS": 3867,
+   "OOS": 2393,
+   "trades_IS": 1227,
+   "trades_OOS": 948,
+   "fin_total": 568,
+   "by_year_worst_fb": {
+    "2019": -292,
+    "2020": 1586,
+    "2021": -87,
+    "2022": 2871,
+    "2023": -279,
+    "2024": -389,
+    "2025": 2625,
+    "2026": 634
+   },
+   "ddIS": 5747,
+   "ddOOS": 4334
+  },
+  {
+   "strategy": "S=02 F=00 buf 30% overnight | DAY R=22 WF | HOLD | entries any hour",
+   "IS": 3865,
+   "OOS": 1277,
+   "trades_IS": 1034,
+   "trades_OOS": 819,
+   "fin_total": 554,
+   "by_year_worst_fb": {
+    "2019": -240,
+    "2020": 1660,
+    "2021": 309,
+    "2022": 1953,
+    "2023": -252,
+    "2024": 653,
+    "2025": 250,
+    "2026": 331
+   },
+   "ddIS": 556,
+   "ddOOS": 949
+  },
+  {
+   "strategy": "FADE S=13 F=18 buf 30% overnight | DAY R=05 WF | HOLD | entries any hour",
+   "IS": 3860,
+   "OOS": 3142,
+   "trades_IS": 1227,
+   "trades_OOS": 949,
+   "fin_total": 558,
+   "by_year_worst_fb": {
+    "2019": -363,
+    "2020": 1437,
+    "2021": -187,
+    "2022": 3143,
+    "2023": -102,
+    "2024": 62,
+    "2025": 2721,
+    "2026": 604
+   },
+   "ddIS": 5818,
+   "ddOOS": 5102
+  },
+  {
+   "strategy": "FADE S=09 F=18 buf 30% always | DAY R=06 WF | HOLD | entries any hour",
+   "IS": 3859,
+   "OOS": 2886,
+   "trades_IS": 1230,
+   "trades_OOS": 952,
+   "fin_total": 556,
+   "by_year_worst_fb": {
+    "2019": -156,
+    "2020": 1188,
+    "2021": 156,
+    "2022": 2885,
+    "2023": -241,
+    "2024": -47,
+    "2025": 2737,
+    "2026": 647
+   },
+   "ddIS": 5861,
+   "ddOOS": 4685
+  },
+  {
+   "strategy": "FADE S=13 F=16 no buffer | DAY R=06 WF | HOLD | entries any hour",
+   "IS": 3856,
+   "OOS": -46,
+   "trades_IS": 1239,
+   "trades_OOS": 972,
+   "fin_total": 577,
+   "by_year_worst_fb": {
+    "2019": -251,
+    "2020": 1710,
+    "2021": 908,
+    "2022": 1684,
+    "2023": -1029,
+    "2024": 219,
+    "2025": 736,
+    "2026": 178
+   },
+   "ddIS": 5787,
+   "ddOOS": 2424
+  },
+  {
+   "strategy": "FADE S=15 F=16 buf 30% overnight | DAY R=07 WF | HOLD | entries any hour",
+   "IS": 3848,
+   "OOS": 804,
+   "trades_IS": 1219,
+   "trades_OOS": 943,
+   "fin_total": 574,
+   "by_year_worst_fb": {
+    "2019": -143,
+    "2020": 1933,
+    "2021": 653,
+    "2022": 1622,
+    "2023": -485,
+    "2024": 299,
+    "2025": 1089,
+    "2026": 88
+   },
+   "ddIS": 5811,
+   "ddOOS": 2723
+  },
+  {
+   "strategy": "S=04 F=00 buf 30% overnight | DAY R=22 WF | HOLD | entries any hour",
+   "IS": 3841,
+   "OOS": 1377,
+   "trades_IS": 1034,
+   "trades_OOS": 819,
+   "fin_total": 549,
+   "by_year_worst_fb": {
+    "2019": -252,
+    "2020": 1460,
+    "2021": 301,
+    "2022": 2150,
+    "2023": -256,
+    "2024": 729,
+    "2025": 266,
+    "2026": 344
+   },
+   "ddIS": 563,
+   "ddOOS": 949
+  }
+ ],
+ "top10_OOS_mean": 2720.6,
+ "top10_OOS_median": 2687.5,
+ "top10_OOS_share_pos": 1.0,
+ "top20_OOS_mean": 2730.55,
+ "top20_OOS_median": 2816.0,
+ "top20_OOS_share_pos": 1.0,
+ "top50_OOS_mean": 2449.68,
+ "top50_OOS_median": 2480.0,
+ "top50_OOS_share_pos": 0.98,
+ "walk_forward": [
+  {
+   "test_year": 2021,
+   "pool": "normal",
+   "best": "S=06 F=01 buf 30% overnight | DAY R=02 WF | HOLD | entries any hour",
+   "best_train": 2529,
+   "best_test": -381,
+   "top20_test_mean": -807,
+   "top20_test_share_pos": 0.1
+  },
+  {
+   "test_year": 2021,
+   "pool": "fade",
+   "best": "FADE S=09 F=15 buf 30% overnight | TIME 24h WF | HOLD | entries any hour",
+   "best_train": 2384,
+   "best_test": 16,
+   "top20_test_mean": 403,
+   "top20_test_share_pos": 0.9
+  },
+  {
+   "test_year": 2022,
+   "pool": "normal",
+   "best": "S=02 F=23 buf 11% overnight | TIME 24h WF | HOLD | entries any hour",
+   "best_train": 3276,
+   "best_test": -41,
+   "top20_test_mean": 322,
+   "top20_test_share_pos": 0.95
+  },
+  {
+   "test_year": 2022,
+   "pool": "fade",
+   "best": "FADE S=12 F=17 buf 30% overnight | TIME 24h WF | HOLD | entries 08:00 only",
+   "best_train": 3027,
+   "best_test": 1055,
+   "top20_test_mean": 1055,
+   "top20_test_share_pos": 1.0
+  },
+  {
+   "test_year": 2023,
+   "pool": "normal",
+   "best": "S=23 F=19 buf 11% overnight | DAY R=22 WF | HOLD | entries 22:00+4h",
+   "best_train": 3237,
+   "best_test": -572,
+   "top20_test_mean": -425,
+   "top20_test_share_pos": 0.0
+  },
+  {
+   "test_year": 2023,
+   "pool": "fade",
+   "best": "FADE S=08 F=18 buf 30% always | DAY R=07 WF | HOLD | entries any hour",
+   "best_train": 3574,
+   "best_test": 306,
+   "top20_test_mean": 61,
+   "top20_test_share_pos": 0.55
+  },
+  {
+   "test_year": 2024,
+   "pool": "normal",
+   "best": "S=02 F=20 buf 30% always | WEEK Mon 09:00 | HOLD",
+   "best_train": 3465,
+   "best_test": -178,
+   "top20_test_mean": -115,
+   "top20_test_share_pos": 0.0
+  },
+  {
+   "test_year": 2024,
+   "pool": "fade",
+   "best": "FADE S=07 F=19 buf 11% overnight | WEEK Tue 04:00 | HOLD",
+   "best_train": 3735,
+   "best_test": -672,
+   "top20_test_mean": -158,
+   "top20_test_share_pos": 0.25
+  },
+  {
+   "test_year": 2025,
+   "pool": "normal",
+   "best": "S=02 F=16 no buffer | WEEK Mon 22:00 | HOLD",
+   "best_train": 2584,
+   "best_test": 729,
+   "top20_test_mean": 179,
+   "top20_test_share_pos": 0.9
+  },
+  {
+   "test_year": 2025,
+   "pool": "fade",
+   "best": "FADE S=05 F=12 buf 11% overnight | TIME 48h WF | HOLD | entries 21:00 only",
+   "best_train": 2868,
+   "best_test": -579,
+   "top20_test_mean": -626,
+   "top20_test_share_pos": 0.0
+  },
+  {
+   "test_year": 2026,
+   "pool": "normal",
+   "best": "S=23 F=18 buf 30% always | WEEK Mon 21:00 | HOLD",
+   "best_train": 3587,
+   "best_test": -42,
+   "top20_test_mean": -140,
+   "top20_test_share_pos": 0.35
+  },
+  {
+   "test_year": 2026,
+   "pool": "fade",
+   "best": "FADE S=10 F=18 buf 11% overnight | DAY R=07 WF | HOLD | entries 07:00+4h",
+   "best_train": 3401,
+   "best_test": 589,
+   "top20_test_mean": 221,
+   "top20_test_share_pos": 1.0
+  }
+ ]
+}
