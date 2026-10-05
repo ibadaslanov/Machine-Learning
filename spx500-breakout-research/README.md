@@ -132,10 +132,40 @@ How the Sharpe ratio is computed: daily P&L divided by price, annualised with �
   - Run them in TradingView with the Bar Magnifier on, so double-break candles use real intrabar data.
   - Compare live fills with the backtest before risking money.
 
+
+### 5. Take-profit on strategy A, and choosing months
+
+`engine/tp.py` gives strategy A a resting take-profit. It is never checked on the entry candle, which is conservative. On later candles it fills at the open if the candle opens beyond it, otherwise at the take-profit price. After a take-profit there is no new trade that day. All figures are after costs and financing, under the worst double-break rule. With the take-profit off, the trades are identical to engine2.
+
+| Take-profit | Net 2019–26 | 2019–22 / 2023–26 | Max DD | Win rate |
+|---|---|---|---|---|
+| none | 4,822 | 3,207 / 1,615 | 945 | 53 % |
+| 5–15 points, or 0.25–0.4 % | 1,200–2,500 | −400 to +250 / 1,300–2,400 | 750–1,300 | 66–85 % |
+| 20 points | 3,566 | 1,672 / 1,894 | **446** | 65 % |
+| 30 points | 4,628 | 2,540 / 2,087 | 587 | 59 % |
+| 50 points | 5,037 | 3,179 / 1,858 | 694 | 55 % |
+| 0.75 % | 4,082 | 2,265 / 1,817 | 558 | 58 % |
+| 1 % | 4,771 | 3,058 / 1,713 | 724 | 56 % |
+| 1.25 % | 5,173 | 3,406 / 1,767 | 751 | 55 % |
+| 2–3 % | 4,750–5,130 | 3,100–3,640 / 1,490–1,660 | 760–940 | 54 % |
+| 0.5–2 × the 08:00 range | 700–2,100 | — | — | — |
+
+- **Small take-profits (≤ 15 pts, ≤ 0.5 %, ≤ 2 × range) hurt badly.** The winners need room to run.
+- **Larger take-profits (30 pts or 0.75–1.25 %) keep about the same profit and cut the max drawdown by 20–40 %.**
+- **Chosen on 2019–22 alone, the best single take-profit (75 pts) did worse in 2023–26 than none (1,300 vs 1,615).**
+
+**Choosing months does not hold up:**
+
+- **Skipping months.** The months that lost in 2019–22 (Jan, Jul, Sep, Oct) were all positive in 2023–26. Skipping them would have cut 2023–26 from +1,615 to +417.
+- **A take-profit chosen separately for each month on 2019–22** gave +2,331 in 2023–26, against +1,615 without one. Picking a random take-profit for each month does that well 6 % of the time, so the gain is not convincing.
+- **Only December was positive in 7 of 8 years.**
+
 ## Files
 
 - `pine/session_frozen_breakout_cycles.pine`: TradingView `strategy()` with every mode above as inputs, plus presets for A–E and the original. It places real stop orders (limit orders when fading) at the next candle's levels. Turn on the Bar Magnifier (Premium) to resolve double-break candles. Add your spread under *Properties → Slippage/Commission*. Financing is not modelled by TradingView.
 - `engine/engine2.py`: backtest engine; `engine/rungrid2.py` runs the full grid (about 20 min on 4 cores, writing a 900 MB result array); `engine/analyse2.py`, `plateau.py`, `deep2.py` and `dsr.py` produce the tables above.
+- `engine/tp.py`: strategy A with take-profit and month filters (section 5).
+- `pine/strategy_A_dashboard_indicator.pine`: free-plan indicator for strategy A with an on-chart results table, optional take-profit and month selection; `pine/strategy_A_0800_range_hold_to_0900.pine` is the strategy-tester version.
 - `engine/engine.py`, `engine/bt.py`: the first engine and the line-by-line Pine port it was validated against.
 - `results/`: JSON outputs (family statistics, top lists, walk-forward, finalist deep-dives, deflated Sharpe).
 
