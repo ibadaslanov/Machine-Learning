@@ -39,7 +39,7 @@ tick     = syminfo.mintick
 
 // One swing point. isTop = true → GAMMA, false → BETTA.
 type Swing
-    bool  isTop
+    bool  isTop     = false
     bool  started   = false
     float exHigh            // the extreme candle (top / bottom)
     float exLow
