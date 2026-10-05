@@ -18,11 +18,15 @@ strategy("BETTA / GAMMA flip", shorttitle = "BETTA/GAMMA", overlay = true,
 //   - Short → go-long order at GAMMA's high.  Long → go-short order at BETTA's low.
 //   - After a flip, the next pivot is searched from the pivot we just used
 //     (BETTA is searched from GAMMA onward, GAMMA from BETTA onward).
-//   - Diffuser: 1 hour after the active pivot, measure from BETTA's high to that
-//     candle's low (GAMMA's low to that candle's high when short).
-//     gap = max(10% of range, 3) + 1. The order moves to that candle's low - gap
-//     (high + gap when short). It only ever tightens. If the pivot is already older
-//     than 1 hour when we enter, the entry candle is measured instead.
+//   - Diffuser: 1 hour after BETTA, measure from BETTA's high to that candle's low.
+//     gap = max(10% of range, 3) + 1, and the order moves to that candle's low - gap.
+//     That candle becomes the new BETTA (inherited) and its 1-hour clock starts.
+//   - If a candle goes below the inherited BETTA's low without hitting the order,
+//     it starts a new BETTA (same BETTA rule). Once it is confirmed, the order moves
+//     to its low and the 1-hour clock restarts from it.
+//   - Short side is the same, flipped (GAMMA's low to that candle's high, high + gap).
+//   - The diffuser only ever tightens the order. If the pivot is already older than
+//     1 hour when we enter, the entry candle is measured.
 //   - A tie (equal high / low) is not a break, so orders sit one tick beyond the level.
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -83,25 +87,28 @@ method feed(Swing s, float h, float l, float ph, float pl, int bi) =>
             s.confirmAt(h, l, bi)
     s
 
-// Feed one candle to the pivot guarding the position: a break flips us instead of
-// cancelling, so the only thing left to do is confirm a pivot that is still waiting.
+// Feed one candle to a pivot that is already guarding the position: a break flips us
+// instead of cancelling, so the only thing left to do is confirm it if it is still waiting.
 method feedActive(Swing s, float h, float l, int bi) =>
     if s.started and not s.confirmed
         if s.isTop ? l < s.exLow : h > s.exHigh
             s.confirmAt(h, l, bi)
     s
 
-method level(Swing s) =>
-    s.isTop ? (s.confirmed ? s.pHigh : s.exHigh) : (s.confirmed ? s.pLow : s.exLow)
-
 var int   dir       = 0      // 1 long, -1 short, 0 waiting for the first trade
-var Swing top       = na     // GAMMA: tracker when long, active when short
-var Swing bot       = na     // BETTA: tracker when short, active when long
+var Swing top       = na     // GAMMA tracker (next pivot when long)
+var Swing bot       = na     // BETTA tracker (next pivot when short)
+// The pivot guarding the position: BETTA when long, GAMMA when short.
+var float aHigh     = na
+var float aLow      = na
+var int   aBar      = na
+var Swing pend      = na     // that pivot if it was still waiting for its confirming candle at entry
+var bool  inherited = false  // it came from the diffuser
+var Swing beyond    = na     // a new pivot forming beyond an inherited one
+var float stopLvl   = na     // flip price: go short below it when long, go long above it when short
+var bool  byDiff    = false  // stopLvl was set by the diffuser
 var float goLong    = na
 var float goShort   = na
-var bool  diffDone  = false
-var float diffStop  = na
-var int   labeledAt = na
 
 if time >= startTime
     if na(top)
@@ -128,12 +135,15 @@ if time >= startTime
         top.feed(high, low, high[1], low[1], bar_index)
         bot.feed(high, low, high[1], low[1], bar_index)
 
-    // 3) Flip: the tracked pivot becomes active, and the next one is searched from it.
+    bool newPivot = false
+    // 3) Flip: the tracked pivot starts guarding the position, and the next one is searched from it.
     if flip != 0
-        dir      := flip
-        diffDone := false
-        Swing act    = flip == 1 ? bot : top
-        int   anchor = act.confirmed ? act.pBar : act.exBar
+        dir       := flip
+        inherited := false
+        beyond    := na
+        byDiff    := false
+        Swing src    = flip == 1 ? bot : top
+        int   anchor = src.confirmed ? src.pBar : src.exBar
         Swing fresh  = Swing.new(flip == 1)
         int   n      = math.min(bar_index - anchor, 4900)
         if n > 0
@@ -143,55 +153,92 @@ if time >= startTime
             top := fresh
         else
             bot := fresh
-    else if dir == 1
-        bot.feedActive(high, low, bar_index)
-    else if dir == -1
-        top.feedActive(high, low, bar_index)
+        if src.confirmed
+            aHigh    := src.pHigh
+            aLow     := src.pLow
+            aBar     := src.pBar
+            pend     := na
+            stopLvl  := flip == 1 ? aLow : aHigh
+            newPivot := true
+        else
+            aHigh   := na
+            aLow    := na
+            aBar    := na
+            pend    := src
+            stopLvl := flip == 1 ? src.exLow : src.exHigh
+    else if dir != 0
+        if not na(pend)
+            // The pivot we entered with gets its confirming candle.
+            pend.feedActive(high, low, bar_index)
+            if pend.confirmed
+                aHigh    := pend.pHigh
+                aLow     := pend.pLow
+                aBar     := pend.pBar
+                pend     := na
+                stopLvl  := dir == 1 ? math.max(stopLvl, aLow) : math.min(stopLvl, aHigh)
+                byDiff   := false
+                newPivot := true
+        else if inherited
+            // A candle beyond the inherited pivot (but short of the order) starts a new one.
+            if na(beyond)
+                if dir == 1 ? low < aLow : high > aHigh
+                    beyond := Swing.new(dir == -1)
+                    beyond.setExtreme(high, low, high[1], low[1], bar_index)
+            else
+                beyond.feed(high, low, high[1], low[1], bar_index)
+            if not na(beyond) and beyond.confirmed
+                aHigh     := beyond.pHigh
+                aLow      := beyond.pLow
+                aBar      := beyond.pBar
+                inherited := false
+                beyond    := na
+                stopLvl   := dir == 1 ? aLow : aHigh
+                byDiff    := false
+                newPivot  := true
 
-    // 4) Diffuser, once per active pivot. Measured on the candle 1 hour after the pivot,
-    //    or on the entry candle if the pivot was already older than that when we entered.
-    if dir != 0
-        Swing act = dir == 1 ? bot : top
-        if act.confirmed and not diffDone and bar_index >= act.pBar + diffBars
-            float ref = dir == 1 ? low : high
-            float rng = math.abs(ref - (dir == 1 ? act.pHigh : act.pLow))
-            float gap = math.max(rng * diffPct / 100, diffMin) + diffExtra
-            diffStop := math.round_to_mintick(dir == 1 ? ref - gap : ref + gap)
-            diffDone := true
-            label.new(x = bar_index, y = ref, text = "DIFF " + str.tostring(gap, "#.##"), xloc = xloc.bar_index,
-                 color = color.new(color.orange, 0), textcolor = color.black, size = size.tiny,
-                 style = dir == 1 ? label.style_label_up : label.style_label_down,
-                 tooltip = "range " + str.tostring(rng, format.mintick) + "\ngap " + str.tostring(gap, format.mintick) +
-                           "\norder " + str.tostring(diffStop, format.mintick))
+    if newPivot
+        label.new(x = aBar, y = dir == 1 ? aLow : aHigh, text = dir == 1 ? "BETTA" : "GAMMA",
+             xloc = xloc.bar_index, color = dir == 1 ? color.teal : color.red, textcolor = color.white, size = size.small,
+             style = dir == 1 ? label.style_label_up : label.style_label_down,
+             tooltip = (dir == 1 ? "go short below " : "go long above ") + str.tostring(stopLvl, format.mintick))
 
-        // Mark the pivot guarding the position.
-        if act.confirmed and (na(labeledAt) or act.pBar != labeledAt)
-            labeledAt := act.pBar
-            label.new(x = act.pBar, y = dir == 1 ? act.pLow : act.pHigh, text = dir == 1 ? "BETTA" : "GAMMA",
-                 xloc = xloc.bar_index, color = dir == 1 ? color.teal : color.red, textcolor = color.white, size = size.small,
-                 style = dir == 1 ? label.style_label_up : label.style_label_down,
-                 tooltip = (dir == 1 ? "go short below " : "go long above ") + str.tostring(act.level(), format.mintick))
+    // 4) Diffuser: 1 hour after the pivot (or on the entry candle if it was older than that).
+    //    This candle becomes the new, inherited pivot and its clock starts.
+    if dir != 0 and not na(aBar) and bar_index >= aBar + diffBars
+        float ref = dir == 1 ? low : high
+        float rng = math.abs(ref - (dir == 1 ? aHigh : aLow))
+        float gap = math.max(rng * diffPct / 100, diffMin) + diffExtra
+        float lvl = math.round_to_mintick(dir == 1 ? ref - gap : ref + gap)
+        if dir == 1 ? lvl > stopLvl : lvl < stopLvl
+            stopLvl := lvl
+            byDiff  := true
+        aHigh     := high
+        aLow      := low
+        aBar      := bar_index
+        inherited := true
+        beyond    := na
+        label.new(x = bar_index, y = ref, text = "DIFF " + str.tostring(gap, "#.##"), xloc = xloc.bar_index,
+             color = color.new(color.orange, 0), textcolor = color.black, size = size.tiny,
+             style = dir == 1 ? label.style_label_up : label.style_label_down,
+             tooltip = "range " + str.tostring(rng, format.mintick) + "\ngap " + str.tostring(gap, format.mintick) +
+                       "\norder " + str.tostring(stopLvl, format.mintick))
 
     // 5) Prices for the next candle.
     if dir == 1
         goLong  := na
-        goShort := bot.level()
-        if diffDone
-            goShort := math.max(goShort, diffStop)
+        goShort := stopLvl
     else if dir == -1
         goShort := na
-        goLong  := top.level()
-        if diffDone
-            goLong := math.min(goLong, diffStop)
+        goLong  := stopLvl
     else
         goLong  := top.confirmed ? top.pHigh : na
         goShort := bot.confirmed ? bot.pLow : na
 
     // 6) Orders, one tick beyond the level so an exact touch doesn't fill.
     if dir == 1
-        strategy.entry("Short", strategy.short, stop = goShort - tick, comment = diffDone and goShort == diffStop ? "Short (diffuser)" : "Short (BETTA)")
+        strategy.entry("Short", strategy.short, stop = goShort - tick, comment = byDiff ? "Short (diffuser)" : "Short (BETTA)")
     else if dir == -1
-        strategy.entry("Long", strategy.long, stop = goLong + tick, comment = diffDone and goLong == diffStop ? "Long (diffuser)" : "Long (GAMMA)")
+        strategy.entry("Long", strategy.long, stop = goLong + tick, comment = byDiff ? "Long (diffuser)" : "Long (GAMMA)")
     else
         if not na(goLong)
             strategy.entry("Long", strategy.long, stop = goLong + tick, oca_name = "first", oca_type = strategy.oca.cancel, comment = "Long (GAMMA)")
