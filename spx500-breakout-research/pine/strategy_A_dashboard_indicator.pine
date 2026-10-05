@@ -15,7 +15,7 @@ freezeHr   = input.int(8,  "Freeze hour (UTC)", minval=0, maxval=23)
 cycleHr    = input.int(9,  "Cycle hour (UTC): close and restart", minval=0, maxval=23)
 bufPct     = input.float(0, "Buffer (% of freeze candle range)", minval=0, step=1) / 100
 costPts    = input.float(0.5, "Cost per trade (points)", minval=0, step=0.1)
-fromTime   = input.time(timestamp("UTC", 2019, 1, 1, 0, 0), "Count trades from")
+fromTime   = input.time(timestamp("01 Jan 2019 00:00 +0000"), "Count trades from")
 ltf        = input.timeframe("1", "Intrabar timeframe for double breaks", group="Double breaks")
 fallback   = input.string("Previous candle colour", "If intrabar data can't decide",
      options=["Previous candle colour", "Level nearest the open"], group="Double breaks")
@@ -28,13 +28,17 @@ weekOf(t)  => math.floor((t / HOUR - 48) / 168)          // weeks start Saturday
 
 h         = hour(time, "UTC")
 prevGreen = close[1] >= open[1]
+prevClose = close[1]
+prevHigh  = high[1]
+prevLow   = low[1]
+prevTime  = time[1]
 [ltH, ltL] = request.security_lower_tf(syminfo.tickerid, ltf, [high, low])
 
 // ---------- levels for this candle ----------
 var float frzH = na
 var float frzL = na
-float lvlH = inSess(h) ? high[1] : frzH
-float lvlL = inSess(h) ? low[1]  : frzL
+float lvlH = inSess(h) ? prevHigh : frzH
+float lvlL = inSess(h) ? prevLow  : frzL
 
 // ---------- state and results ----------
 var int   pos       = 0
@@ -55,20 +59,22 @@ var int   dblFb     = 0
 var yearly = map.new<int, float>()
 var int firstTime = time
 
-hasPrev  = not na(time[1])
-newWeek  = hasPrev and weekOf(time) != weekOf(time[1])
-newCycle = hasPrev and cycleOf(time) != cycleOf(time[1])
-reopen   = hasPrev and time - time[1] >= 2 * HOUR and math.abs(open - close[1]) < syminfo.mintick / 2
+hasPrev  = not na(prevTime)
+newWeek  = hasPrev and weekOf(time) != weekOf(prevTime)
+newCycle = hasPrev and cycleOf(time) != cycleOf(prevTime)
+reopen   = hasPrev and time - prevTime >= 2 * HOUR and math.abs(open - prevClose) < syminfo.mintick / 2
 
 // ---------- 1. exits ----------
 float exitPx  = na
 int   exitBar = bar_index
 int   exitYr  = year(time, "UTC")
+float exitY   = pos == 1 ? high : low
 string why    = ""
 if pos != 0 and newWeek                 // the week ended on the previous candle: close at its close
-    exitPx  := close[1]
+    exitPx  := prevClose
     exitBar := bar_index - 1
-    exitYr  := year(time[1], "UTC")
+    exitYr  := year(prevTime, "UTC")
+    exitY   := pos == 1 ? prevHigh : prevLow
     why     := "week end"
 else if pos != 0 and newCycle           // new cycle: close at this candle's open
     exitPx  := open
@@ -89,7 +95,7 @@ if not na(exitPx)
         maxDD := math.max(maxDD, peak - eq)
         yearly.put(exitYr, nz(yearly.get(exitYr)) + p)
     if showLabels
-        label.new(exitBar, pos == 1 ? high[bar_index - exitBar] : low[bar_index - exitBar],
+        label.new(exitBar, exitY,
              text="exit " + why + "\n" + (p >= 0 ? "+" : "") + str.tostring(p, "0.0"),
              color=color.new(p >= 0 ? color.lime : color.red, 80), textcolor=p >= 0 ? color.lime : color.red,
              style=pos == 1 ? label.style_label_down : label.style_label_up, size=size.small)
