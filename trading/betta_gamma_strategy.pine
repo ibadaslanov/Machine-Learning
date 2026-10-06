@@ -99,14 +99,12 @@ method feedActive(Swing s, float h, float l, int bi) =>
     s
 
 // Box + label around a BETTA (d = 1) or GAMMA (d = -1) candle at time t.
-// Inherited pivots (from the diffuser) get a dashed box.
-drawPivot(int d, float h, float l, int t, string txt, bool inheritedPivot, float orderPx) =>
+drawPivot(int d, float h, float l, int t, float orderPx) =>
     color c    = d == 1 ? BETTA_COL : GAMMA_COL
     int   half = math.round(timeframe.in_seconds() * 1000 * 0.45)
     box.new(left = t - half, top = h, right = t + half, bottom = l, xloc = xloc.bar_time,
-         border_color = c, border_width = 2, border_style = inheritedPivot ? line.style_dashed : line.style_solid,
-         bgcolor = color.new(c, inheritedPivot ? 85 : 65))
-    label.new(x = t, y = d == 1 ? l : h, text = txt, xloc = xloc.bar_time, color = c, textcolor = color.white,
+         border_color = c, border_width = 2, bgcolor = color.new(c, 65))
+    label.new(x = t, y = d == 1 ? l : h, text = d == 1 ? "BETTA" : "GAMMA", xloc = xloc.bar_time, color = c, textcolor = color.white,
          size = size.small, style = d == 1 ? label.style_label_up : label.style_label_down,
          tooltip = (d == 1 ? "go short below " : "go long above ") + str.tostring(orderPx, format.mintick))
 
@@ -124,7 +122,6 @@ var float stopLvl   = na     // flip price: go short below it when long, go long
 var bool  byDiff    = false  // stopLvl was set by the diffuser
 var float goLong    = na
 var float goShort   = na
-var float entryPx   = na
 
 if time >= startTime
     if na(top)
@@ -154,16 +151,12 @@ if time >= startTime
     bool newPivot = false
     // 3) Flip: the tracked pivot starts guarding the position, and the next one is searched from it.
     if flip != 0
-        // Entry / exit marker. A flip closes the old position and opens the new one.
+        // Executed order and its price. A flip closes the old position and opens the new one.
         float  fill = flip == 1 ? math.max(open, goLong + tick) : math.min(open, goShort - tick)
         string txt  = (flip == 1 ? "BUY " : "SELL ") + str.tostring(fill, format.mintick)
-        if dir != 0
-            float pnl = (fill - entryPx) * dir
-            txt := txt + "\n" + (dir == 1 ? "long " : "short ") + (pnl >= 0 ? "+" : "") + str.tostring(pnl, format.mintick)
         label.new(x = bar_index, y = flip == 1 ? low : high, text = txt, yloc = flip == 1 ? yloc.belowbar : yloc.abovebar,
              color = flip == 1 ? BUY_COL : SELL_COL, textcolor = color.white, size = size.small,
              style = flip == 1 ? label.style_label_up : label.style_label_down)
-        entryPx   := fill
         dir       := flip
         inherited := false
         beyond    := na
@@ -223,7 +216,7 @@ if time >= startTime
                 newPivot  := true
 
     if newPivot and bar_index - aBar <= 4900
-        drawPivot(dir, aHigh, aLow, time[bar_index - aBar], dir == 1 ? "BETTA" : "GAMMA", false, stopLvl)
+        drawPivot(dir, aHigh, aLow, time[bar_index - aBar], stopLvl)
 
     // 4) Diffuser: 1 hour after the pivot (or on the entry candle if it was older than that).
     //    This candle becomes the new, inherited pivot and its clock starts.
@@ -240,7 +233,7 @@ if time >= startTime
         aBar      := bar_index
         inherited := true
         beyond    := na
-        drawPivot(dir, high, low, time, (dir == 1 ? "BETTA" : "GAMMA") + " gap " + str.tostring(gap, "#.#"), true, stopLvl)
+        drawPivot(dir, high, low, time, stopLvl)
 
     // 5) Prices for the next candle.
     if dir == 1
