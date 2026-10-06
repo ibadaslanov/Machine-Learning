@@ -2,7 +2,7 @@
 //@version=6
 strategy("BETTA / GAMMA flip", shorttitle = "BETTA/GAMMA", overlay = true,
      pyramiding = 0, default_qty_type = strategy.fixed, default_qty_value = 1,
-     initial_capital = 100000, max_bars_back = 5000, max_labels_count = 500)
+     initial_capital = 100000, max_bars_back = 5000, max_labels_count = 500, max_boxes_count = 500)
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Rules
@@ -35,11 +35,14 @@ diffMinutes = input.int(60, "Diffuser: minutes after pivot", minval = 1)
 diffPct     = input.float(10.0, "Diffuser: % of range", minval = 0)
 diffMin     = input.float(3.0, "Diffuser: minimum gap (points)", minval = 0)
 diffExtra   = input.float(1.0, "Diffuser: extra (points)", minval = 0)
-showNext    = input.bool(true, "Show next pivot being tracked")
-showBg      = input.bool(true, "Color background by position")
 
 diffBars = math.max(1, math.round(diffMinutes * 60 / timeframe.in_seconds()))
 tick     = syminfo.mintick
+
+BETTA_COL = #2962FF
+GAMMA_COL = #FF9800
+BUY_COL   = #089981
+SELL_COL  = #F23645
 
 // One swing point. isTop = true → GAMMA, false → BETTA.
 type Swing
@@ -95,6 +98,18 @@ method feedActive(Swing s, float h, float l, int bi) =>
             s.confirmAt(h, l, bi)
     s
 
+// Box + label around a BETTA (d = 1) or GAMMA (d = -1) candle at time t.
+// Inherited pivots (from the diffuser) get a dashed box.
+drawPivot(int d, float h, float l, int t, string txt, bool inheritedPivot, float orderPx) =>
+    color c    = d == 1 ? BETTA_COL : GAMMA_COL
+    int   half = math.round(timeframe.in_seconds() * 1000 * 0.45)
+    box.new(left = t - half, top = h, right = t + half, bottom = l, xloc = xloc.bar_time,
+         border_color = c, border_width = 2, border_style = inheritedPivot ? line.style_dashed : line.style_solid,
+         bgcolor = color.new(c, inheritedPivot ? 85 : 65))
+    label.new(x = t, y = d == 1 ? l : h, text = txt, xloc = xloc.bar_time, color = c, textcolor = color.white,
+         size = size.small, style = d == 1 ? label.style_label_up : label.style_label_down,
+         tooltip = (d == 1 ? "go short below " : "go long above ") + str.tostring(orderPx, format.mintick))
+
 var int   dir       = 0      // 1 long, -1 short, 0 waiting for the first trade
 var Swing top       = na     // GAMMA tracker (next pivot when long)
 var Swing bot       = na     // BETTA tracker (next pivot when short)
@@ -109,6 +124,7 @@ var float stopLvl   = na     // flip price: go short below it when long, go long
 var bool  byDiff    = false  // stopLvl was set by the diffuser
 var float goLong    = na
 var float goShort   = na
+var float entryPx   = na
 
 if time >= startTime
     if na(top)
@@ -138,6 +154,16 @@ if time >= startTime
     bool newPivot = false
     // 3) Flip: the tracked pivot starts guarding the position, and the next one is searched from it.
     if flip != 0
+        // Entry / exit marker. A flip closes the old position and opens the new one.
+        float  fill = flip == 1 ? math.max(open, goLong + tick) : math.min(open, goShort - tick)
+        string txt  = (flip == 1 ? "BUY " : "SELL ") + str.tostring(fill, format.mintick)
+        if dir != 0
+            float pnl = (fill - entryPx) * dir
+            txt := txt + "\n" + (dir == 1 ? "long " : "short ") + (pnl >= 0 ? "+" : "") + str.tostring(pnl, format.mintick)
+        label.new(x = bar_index, y = flip == 1 ? low : high, text = txt, yloc = flip == 1 ? yloc.belowbar : yloc.abovebar,
+             color = flip == 1 ? BUY_COL : SELL_COL, textcolor = color.white, size = size.small,
+             style = flip == 1 ? label.style_label_up : label.style_label_down)
+        entryPx   := fill
         dir       := flip
         inherited := false
         beyond    := na
@@ -196,11 +222,8 @@ if time >= startTime
                 byDiff    := false
                 newPivot  := true
 
-    if newPivot
-        label.new(x = aBar, y = dir == 1 ? aLow : aHigh, text = dir == 1 ? "BETTA" : "GAMMA",
-             xloc = xloc.bar_index, color = dir == 1 ? color.teal : color.red, textcolor = color.white, size = size.small,
-             style = dir == 1 ? label.style_label_up : label.style_label_down,
-             tooltip = (dir == 1 ? "go short below " : "go long above ") + str.tostring(stopLvl, format.mintick))
+    if newPivot and bar_index - aBar <= 4900
+        drawPivot(dir, aHigh, aLow, time[bar_index - aBar], dir == 1 ? "BETTA" : "GAMMA", false, stopLvl)
 
     // 4) Diffuser: 1 hour after the pivot (or on the entry candle if it was older than that).
     //    This candle becomes the new, inherited pivot and its clock starts.
@@ -217,11 +240,7 @@ if time >= startTime
         aBar      := bar_index
         inherited := true
         beyond    := na
-        label.new(x = bar_index, y = ref, text = "DIFF " + str.tostring(gap, "#.##"), xloc = xloc.bar_index,
-             color = color.new(color.orange, 0), textcolor = color.black, size = size.tiny,
-             style = dir == 1 ? label.style_label_up : label.style_label_down,
-             tooltip = "range " + str.tostring(rng, format.mintick) + "\ngap " + str.tostring(gap, format.mintick) +
-                       "\norder " + str.tostring(stopLvl, format.mintick))
+        drawPivot(dir, high, low, time, (dir == 1 ? "BETTA" : "GAMMA") + " gap " + str.tostring(gap, "#.#"), true, stopLvl)
 
     // 5) Prices for the next candle.
     if dir == 1
@@ -248,9 +267,3 @@ if time >= startTime
             strategy.entry("Short", strategy.short, stop = goShort - tick, oca_name = "first", oca_type = strategy.oca.cancel, comment = "Short (BETTA)")
         else
             strategy.cancel("Short")
-
-plot(dir >= 0 ? goShort : na, "Go-short price", color.red, 2, plot.style_linebr)
-plot(dir <= 0 ? goLong : na, "Go-long price", color.teal, 2, plot.style_linebr)
-plot(showNext and dir == 1 and not na(top) and top.confirmed ? top.pHigh : na, "Next GAMMA", color.new(color.red, 50), 1, plot.style_circles)
-plot(showNext and dir == -1 and not na(bot) and bot.confirmed ? bot.pLow : na, "Next BETTA", color.new(color.teal, 50), 1, plot.style_circles)
-bgcolor(showBg ? (dir == 1 ? color.new(color.teal, 92) : dir == -1 ? color.new(color.red, 92) : na) : na)
