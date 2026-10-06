@@ -260,3 +260,24 @@ if time >= startTime
             strategy.entry("Short", strategy.short, stop = goShort - tick, oca_name = "first", oca_type = strategy.oca.cancel, comment = "Short (BETTA)")
         else
             strategy.cancel("Short")
+
+// ── Profit table ────────────────────────────────────────────────────────────
+var table stats = table.new(position.top_right, 2, 5, bgcolor = color.new(color.black, 25),
+     border_color = color.new(color.gray, 70), border_width = 1)
+
+statRow(int row, string name, string value, color valueCol) =>
+    table.cell(stats, 0, row, name, text_color = color.white, text_halign = text.align_left, text_size = size.normal)
+    table.cell(stats, 1, row, value, text_color = valueCol, text_halign = text.align_right, text_size = size.normal)
+
+money(float x) =>
+    (x >= 0 ? "+" : "") + str.tostring(x, "#,##0.0") + " " + strategy.account_currency
+
+if barstate.islast
+    float total  = strategy.netprofit + strategy.openprofit
+    int   trades = strategy.closedtrades
+    float winPct = trades > 0 ? strategy.wintrades * 100.0 / trades : 0.0
+    statRow(0, "Total profit", money(total), total >= 0 ? BUY_COL : SELL_COL)
+    statRow(1, "Open trade", money(strategy.openprofit), strategy.openprofit >= 0 ? BUY_COL : SELL_COL)
+    statRow(2, "Trades", str.tostring(trades), color.white)
+    statRow(3, "Win rate", str.tostring(winPct, "#.#") + "% (" + str.tostring(strategy.wintrades) + "/" + str.tostring(trades) + ")", color.white)
+    statRow(4, "Max drawdown", money(-strategy.max_drawdown), SELL_COL)
