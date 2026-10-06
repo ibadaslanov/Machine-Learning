@@ -14,7 +14,9 @@ sessStr    = input.string("00:00,01:00,02:00,03:00,04:00,05:00,05:30,06:00,06:30
 maxRev     = input.int(2, "Max reversals per session", minval = 0)
 closeAfter = input.bool(true, "Close the trade on the next cross after the last reversal (off = hold to next day)")
 cost       = input.float(0.0, "Cost per trade in points (spread + commission)", minval = 0)
-showFor    = input.string("", "Draw trades on the chart for this session (e.g. 14:00, empty = none)")
+showFor    = input.string("all", "Draw trades on the chart: all, one session (e.g. 14:00), or none")
+tablePos   = input.string("Bottom right", "Table position",
+     options = ["Top right", "Middle right", "Bottom right", "Top left", "Middle left", "Bottom left", "Top center", "Bottom center"])
 
 if timeframe.in_seconds() != 300
     runtime.error("Use a 5-minute chart")
@@ -40,7 +42,7 @@ var array<float>  rPts    = array.new<float>()
 var array<float>  rPct    = array.new<float>()
 var array<float>  rGW     = array.new<float>()
 var array<float>  rGL     = array.new<float>()
-var int           showIdx = -1
+var int           showIdx = -1               // session to draw, -2 = all, -1 = none
 
 if barstate.isfirst
     for s in str.split(str.replace_all(sessStr, " ", ""), ",")
@@ -69,16 +71,17 @@ if barstate.isfirst
         array.push(rPct, 0.0)
         array.push(rGW, 0.0)
         array.push(rGL, 0.0)
-    showIdx := array.indexof(sName, str.replace_all(showFor, " ", ""))
+    want = str.lower(str.replace_all(showFor, " ", ""))
+    showIdx := want == "all" ? -2 : array.indexof(sName, want)
 
 // Inside a bar, price goes to the extreme nearest the open first (same rule as TradingView's strategies).
 pA = high - open <= open - low ? high : low
 pB = pA == high ? low : high
 
 mark(int k, string txt, float price, bool above, color c) =>
-    if k == showIdx
-        label.new(bar_index, price, txt, yloc = yloc.price, color = c, textcolor = color.white, size = size.small,
-             style = above ? label.style_label_down : label.style_label_up)
+    if showIdx == -2 or k == showIdx
+        label.new(bar_index, price, array.get(sName, k) + " " + txt, yloc = yloc.price, color = c,
+             textcolor = color.white, size = size.tiny, style = above ? label.style_label_down : label.style_label_up)
 
 closeTrade(int k, float px) =>
     side  = array.get(aPos, k)
@@ -196,7 +199,16 @@ for k = 0 to array.size(sMin) - 1
 
 // ---- Profit table ----
 
-var table tbl = table.new(position.top_right, 6, array.size(sMin) + 2,
+pos = switch tablePos
+    "Top right"     => position.top_right
+    "Middle right"  => position.middle_right
+    "Top left"      => position.top_left
+    "Middle left"   => position.middle_left
+    "Bottom left"   => position.bottom_left
+    "Top center"    => position.top_center
+    "Bottom center" => position.bottom_center
+    => position.bottom_right
+var table tbl = table.new(pos, 6, array.size(sMin) + 2,
      bgcolor = #131722, border_color = #2a2e39, border_width = 1)
 
 cell(int c, int r, string txt, color tc) =>
