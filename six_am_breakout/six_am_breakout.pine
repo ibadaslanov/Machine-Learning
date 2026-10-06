@@ -8,12 +8,19 @@ sessStr    = input.string("00:00,01:00,02:00,03:00,04:00,05:00,05:30,06:00,06:30
      "Session times (HH:MM, comma separated)")
 maxRev     = input.int(2, "Max reversals per session", minval = 0)
 closeAfter = input.bool(true, "Close the trade on the next cross after the last reversal (off = hold to next session)")
+showTable  = input.bool(true, "Show profit table")
 
 if timeframe.in_seconds() != 300
     runtime.error("Use a 5-minute chart")
 
-// Session times in minutes of the day.
-var array<int> sessions = array.new<int>()
+// Session times in minutes of the day, plus per-session results for the profit table.
+var array<int>    sessions   = array.new<int>()
+var array<string> names      = array.new<string>()
+var array<int>    sTrades    = array.new<int>()
+var array<int>    sWins      = array.new<int>()
+var array<float>  sNet       = array.new<float>()
+var array<float>  sGrossWin  = array.new<float>()
+var array<float>  sGrossLoss = array.new<float>()
 if barstate.isfirst
     for s in str.split(str.replace_all(sessStr, " ", ""), ",")
         parts = str.split(s, ":")
@@ -23,6 +30,12 @@ if barstate.isfirst
         if na(mins) or mins % 5 != 0
             runtime.error("Bad session time: " + s)
         array.push(sessions, mins)
+        array.push(names, s)
+        array.push(sTrades, 0)
+        array.push(sWins, 0)
+        array.push(sNet, 0.0)
+        array.push(sGrossWin, 0.0)
+        array.push(sGrossLoss, 0.0)
 
 barT  = hour(time, tz) * 60 + minute(time, tz)
 isRef = array.includes(sessions, (barT + 5) % 1440)   // the candle 5 minutes before a session
@@ -35,10 +48,29 @@ var float sigLow   = na
 var float revLevel = na
 var bool  active   = false              // current session's setup is running
 var int   base     = 0                  // trade count when the session was armed
+var int   curSess  = -1                 // index of the current session
+var array<int> tradeSess = array.new<int>()   // session index of every trade, in order
+var int   booked   = 0                  // closed trades already added to the table
 
 trades = strategy.closedtrades + strategy.opentrades
 n      = trades - base                  // entries this session: first trade + each reversal
 pos    = strategy.position_size
+
+// Tag each new trade with the session that opened it, then book closed trades under it.
+while array.size(tradeSess) < trades
+    array.push(tradeSess, curSess)
+while booked < strategy.closedtrades
+    k = array.get(tradeSess, booked)
+    p = strategy.closedtrades.profit(booked)
+    if k >= 0 and not na(p)
+        array.set(sTrades, k, array.get(sTrades, k) + 1)
+        array.set(sNet, k, array.get(sNet, k) + p)
+        if p > 0
+            array.set(sWins, k, array.get(sWins, k) + 1)
+            array.set(sGrossWin, k, array.get(sGrossWin, k) + p)
+        else
+            array.set(sGrossLoss, k, array.get(sGrossLoss, k) - p)
+    booked += 1
 
 if isRef
     // Reference candle closed: close the previous session's trade at the session open
@@ -52,6 +84,7 @@ if isRef
     revLevel := na
     base     := trades
     active   := true
+    curSess  := array.indexof(sessions, (barT + 5) % 1440)
     strategy.entry("Long", strategy.long, stop = refHigh, comment = "Break high")
     strategy.entry("Short", strategy.short, stop = refLow, comment = "Break low")
 else if active
@@ -87,3 +120,35 @@ plot(refHigh, "Reference high", color.teal, 1, plot.style_stepline)
 plot(refLow, "Reference low", color.red, 1, plot.style_stepline)
 plot(revLevel, "Reverse / stop", color.orange, 2, plot.style_linebr)
 bgcolor(isSig ? color.new(color.blue, 85) : na, title = "Session candle")
+
+// ---- Profit table: closed trades grouped by the session that opened them ----
+
+var table tbl = table.new(position.top_right, 5, array.size(sessions) + 2,
+     bgcolor = #131722, border_color = #2a2e39, border_width = 1)
+
+fillRow(int r, string name, int t, int w, float net, float gw, float gl) =>
+    pnlColor = net > 0 ? #26a69a : net < 0 ? #ef5350 : color.white
+    table.cell(tbl, 0, r, name, text_color = color.white, text_size = size.small)
+    table.cell(tbl, 1, r, str.tostring(t), text_color = color.white, text_size = size.small)
+    table.cell(tbl, 2, r, t > 0 ? str.tostring(100.0 * w / t, "0.0") : "-", text_color = color.white, text_size = size.small)
+    table.cell(tbl, 3, r, str.tostring(net, "#,##0.00"), text_color = pnlColor, text_size = size.small)
+    table.cell(tbl, 4, r, gl > 0 ? str.tostring(gw / gl, "0.00") : "-", text_color = color.white, text_size = size.small)
+
+if showTable and barstate.islast
+    headers = array.from("Session", "Trades", "Win %", "Net profit", "Profit factor")
+    for c = 0 to 4
+        table.cell(tbl, c, 0, array.get(headers, c), text_color = color.white, bgcolor = #2a2e39, text_size = size.small)
+    int   totT  = 0
+    int   totW  = 0
+    float totN  = 0.0
+    float totGW = 0.0
+    float totGL = 0.0
+    for k = 0 to array.size(sessions) - 1
+        fillRow(k + 1, array.get(names, k), array.get(sTrades, k), array.get(sWins, k),
+             array.get(sNet, k), array.get(sGrossWin, k), array.get(sGrossLoss, k))
+        totT  += array.get(sTrades, k)
+        totW  += array.get(sWins, k)
+        totN  += array.get(sNet, k)
+        totGW += array.get(sGrossWin, k)
+        totGL += array.get(sGrossLoss, k)
+    fillRow(array.size(sessions) + 1, "Total", totT, totW, totN, totGW, totGL)

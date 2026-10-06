@@ -45,6 +45,9 @@ runs the same setup at every time in its session list (default: every hour
 5-minute candle before it, and each trade runs until the next session in the
 list. It reverses between the session candle's high and low up to 2 times; the
 next cross after that closes the trade. All of these are inputs.
+A table in the top-right corner shows trades, win %, net profit and profit
+factor for each session time (closed trades, grouped by the session that
+opened them), plus a total row.
 
 ## Usage (Python backtest)
 
