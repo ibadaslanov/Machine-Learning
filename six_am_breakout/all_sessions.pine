@@ -1,0 +1,233 @@
+//@version=6
+indicator("All Sessions Breakout + Reverse", overlay = true, max_labels_count = 500)
+
+// Every session time is traded on its own, like a separate strategy, so trades from
+// different times overlap (one can be long while another is short):
+// - the session candle breaks the previous 5-minute candle's high (long) or low (short)
+// - reverse at the session candle's low/high, up to "max reversals"; the next cross then closes it
+// - no take profit: the trade is closed at the same time the next day
+// Results are in points for 1 unit, closed trades only.
+// Use on a 5-minute chart. Set the timezone to the one your chart shows.
+tz         = input.string("UTC", "Timezone (e.g. UTC, Asia/Baku, GMT+4)")
+sessStr    = input.string("00:00,01:00,02:00,03:00,04:00,05:00,05:30,06:00,06:30,07:00,08:00,09:00,10:00,11:00,12:00,13:00",
+     "Session times (HH:MM, comma separated)")
+maxRev     = input.int(2, "Max reversals per session", minval = 0)
+closeAfter = input.bool(true, "Close the trade on the next cross after the last reversal (off = hold to next day)")
+cost       = input.float(0.0, "Cost per trade in points (spread + commission)", minval = 0)
+showFor    = input.string("", "Draw trades on the chart for this session (e.g. 14:00, empty = none)")
+
+if timeframe.in_seconds() != 300
+    runtime.error("Use a 5-minute chart")
+
+var array<int>    sMin    = array.new<int>()
+var array<string> sName   = array.new<string>()
+// trade state per session
+var array<int>    aPos    = array.new<int>()      // 1 long, -1 short, 0 flat
+var array<float>  aEntry  = array.new<float>()
+var array<int>    aRevs   = array.new<int>()
+var array<bool>   aWin    = array.new<bool>()     // session candle still forming
+var array<bool>   aActive = array.new<bool>()     // orders may be pending
+var array<float>  aRefH   = array.new<float>()
+var array<float>  aRefL   = array.new<float>()
+var array<float>  aSigH   = array.new<float>()
+var array<float>  aSigL   = array.new<float>()
+var array<float>  aBuy    = array.new<float>()    // pending buy stop, na = none
+var array<float>  aSell   = array.new<float>()    // pending sell stop, na = none
+// results per session
+var array<int>    rTrades = array.new<int>()
+var array<int>    rWins   = array.new<int>()
+var array<float>  rPts    = array.new<float>()
+var array<float>  rPct    = array.new<float>()
+var array<float>  rGW     = array.new<float>()
+var array<float>  rGL     = array.new<float>()
+var int           showIdx = -1
+
+if barstate.isfirst
+    for s in str.split(str.replace_all(sessStr, " ", ""), ",")
+        parts = str.split(s, ":")
+        if array.size(parts) != 2
+            runtime.error("Bad session time: " + s)
+        mins = int(str.tonumber(array.get(parts, 0))) * 60 + int(str.tonumber(array.get(parts, 1)))
+        if na(mins) or mins % 5 != 0
+            runtime.error("Bad session time: " + s)
+        array.push(sMin, mins)
+        array.push(sName, s)
+        array.push(aPos, 0)
+        array.push(aEntry, na)
+        array.push(aRevs, 0)
+        array.push(aWin, false)
+        array.push(aActive, false)
+        array.push(aRefH, na)
+        array.push(aRefL, na)
+        array.push(aSigH, na)
+        array.push(aSigL, na)
+        array.push(aBuy, na)
+        array.push(aSell, na)
+        array.push(rTrades, 0)
+        array.push(rWins, 0)
+        array.push(rPts, 0.0)
+        array.push(rPct, 0.0)
+        array.push(rGW, 0.0)
+        array.push(rGL, 0.0)
+    showIdx := array.indexof(sName, str.replace_all(showFor, " ", ""))
+
+// Inside a bar, price goes to the extreme nearest the open first (same rule as TradingView's strategies).
+pA = high - open <= open - low ? high : low
+pB = pA == high ? low : high
+
+mark(int k, string txt, float price, bool above, color c) =>
+    if k == showIdx
+        label.new(bar_index, price, txt, yloc = yloc.price, color = c, textcolor = color.white, size = size.small,
+             style = above ? label.style_label_down : label.style_label_up)
+
+closeTrade(int k, float px) =>
+    side  = array.get(aPos, k)
+    entry = array.get(aEntry, k)
+    pts   = side * (px - entry) - cost
+    array.set(rTrades, k, array.get(rTrades, k) + 1)
+    array.set(rPts, k, array.get(rPts, k) + pts)
+    array.set(rPct, k, array.get(rPct, k) + 100 * pts / entry)
+    if pts > 0
+        array.set(rWins, k, array.get(rWins, k) + 1)
+        array.set(rGW, k, array.get(rGW, k) + pts)
+    else
+        array.set(rGL, k, array.get(rGL, k) - pts)
+    array.set(aPos, k, 0)
+    pts
+
+// Reverse (or stop) order for the open trade: long -> sell stop at the low, short -> buy stop at the high.
+// While the session candle is forming the levels are the reference candle's low/high.
+placeExit(int k) =>
+    p = array.get(aPos, k)
+    w = array.get(aWin, k)
+    array.set(aBuy, k, na)
+    array.set(aSell, k, na)
+    if array.get(aRevs, k) < maxRev or closeAfter
+        if p > 0
+            array.set(aSell, k, w ? array.get(aRefL, k) : array.get(aSigL, k))
+        else if p < 0
+            array.set(aBuy, k, w ? array.get(aRefH, k) : array.get(aSigH, k))
+
+doFill(int k, int side, float px) =>
+    txt = side > 0 ? "Buy" : "Sell"
+    c   = side > 0 ? color.teal : color.red
+    if array.get(aPos, k) == 0
+        array.set(aPos, k, side)
+        array.set(aEntry, k, px)
+        mark(k, txt, px, side < 0, c)
+        placeExit(k)
+    else if array.get(aRevs, k) < maxRev
+        pts = closeTrade(k, px)
+        array.set(aPos, k, side)
+        array.set(aEntry, k, px)
+        array.set(aRevs, k, array.get(aRevs, k) + 1)
+        mark(k, "Rev " + txt + " " + str.tostring(pts, "+0.0;-0.0"), px, side < 0, c)
+        placeExit(k)
+    else
+        pts = closeTrade(k, px)
+        mark(k, "Stop " + str.tostring(pts, "+0.0;-0.0"), px, side < 0, color.gray)
+        array.set(aBuy, k, na)
+        array.set(aSell, k, na)
+        array.set(aActive, k, false)
+
+// Fill this session's pending stop orders along the bar's price path.
+simBar(int k) =>
+    for i = 0 to 3
+        b = array.get(aBuy, k)
+        s = array.get(aSell, k)
+        if not na(b) and open >= b
+            doFill(k, 1, open)
+        else if not na(s) and open <= s
+            doFill(k, -1, open)
+        else
+            break
+    float px = open
+    for j = 0 to 2
+        target = j == 0 ? pA : j == 1 ? pB : close
+        for i = 0 to 3
+            b = array.get(aBuy, k)
+            s = array.get(aSell, k)
+            if target > px and not na(b) and px <= b and b <= target
+                px := b
+                doFill(k, 1, b)
+            else if target < px and not na(s) and s <= px and s >= target
+                px := s
+                doFill(k, -1, s)
+            else
+                break
+        px := target
+
+barT  = hour(time, tz) * 60 + minute(time, tz)
+prevT = hour(time[1], tz) * 60 + minute(time[1], tz)
+
+for k = 0 to array.size(sMin) - 1
+    sm    = array.get(sMin, k)
+    isSig = barT == sm
+    if isSig
+        // Session candle opens: yesterday's trade closes at the open, today's breakout is armed.
+        if array.get(aPos, k) != 0
+            pts = closeTrade(k, open)
+            mark(k, "Close " + str.tostring(pts, "+0.0;-0.0"), open, true, color.gray)
+        hasRef = prevT == (sm + 1435) % 1440
+        array.set(aRefH, k, high[1])
+        array.set(aRefL, k, low[1])
+        array.set(aBuy, k, hasRef ? high[1] : na)
+        array.set(aSell, k, hasRef ? low[1] : na)
+        array.set(aRevs, k, 0)
+        array.set(aWin, k, true)
+        array.set(aActive, k, hasRef)
+    if array.get(aActive, k)
+        simBar(k)
+    if isSig
+        // Session candle closed: no breakout means no trade today,
+        // otherwise the reverse order moves to the session candle's low/high.
+        array.set(aWin, k, false)
+        array.set(aSigH, k, high)
+        array.set(aSigL, k, low)
+        p = array.get(aPos, k)
+        if p == 0
+            array.set(aBuy, k, na)
+            array.set(aSell, k, na)
+            array.set(aActive, k, false)
+        else if p > 0 and not na(array.get(aSell, k))
+            array.set(aSell, k, low)
+        else if p < 0 and not na(array.get(aBuy, k))
+            array.set(aBuy, k, high)
+
+// ---- Profit table ----
+
+var table tbl = table.new(position.top_right, 6, array.size(sMin) + 2,
+     bgcolor = #131722, border_color = #2a2e39, border_width = 1)
+
+cell(int c, int r, string txt, color tc) =>
+    table.cell(tbl, c, r, txt, text_color = tc, text_size = size.small)
+
+fillRow(int r, string name, int t, int w, float pts, float pct, float gw, float gl) =>
+    pc = pts > 0 ? #26a69a : pts < 0 ? #ef5350 : color.white
+    cell(0, r, name, color.white)
+    cell(1, r, str.tostring(t), color.white)
+    cell(2, r, t > 0 ? str.tostring(100.0 * w / t, "0.0") : "-", color.white)
+    cell(3, r, str.tostring(pts, "#,##0.0"), pc)
+    cell(4, r, str.tostring(pct, "0.00") + "%", pc)
+    cell(5, r, gl > 0 ? str.tostring(gw / gl, "0.00") : "-", color.white)
+
+if barstate.islast
+    headers = array.from("Session", "Trades", "Win %", "Net points", "Net %", "Profit factor")
+    for c = 0 to 5
+        table.cell(tbl, c, 0, array.get(headers, c), text_color = color.white, bgcolor = #2a2e39, text_size = size.small)
+    int   totT  = 0
+    int   totW  = 0
+    float totP  = 0.0
+    float totC  = 0.0
+    float totGW = 0.0
+    float totGL = 0.0
+    for k = 0 to array.size(sMin) - 1
+        fillRow(k + 1, array.get(sName, k), array.get(rTrades, k), array.get(rWins, k),
+             array.get(rPts, k), array.get(rPct, k), array.get(rGW, k), array.get(rGL, k))
+        totT  += array.get(rTrades, k)
+        totW  += array.get(rWins, k)
+        totP  += array.get(rPts, k)
+        totC  += array.get(rPct, k)
+        totGW += array.get(rGW, k)
+        totGL += array.get(rGL, k)
+    fillRow(array.size(sMin) + 1, "Total", totT, totW, totP, totC, totGW, totGL)

@@ -38,16 +38,19 @@ runs it several ways (`--mode`, or `--compare` for all at once):
 
 ## TradingView
 
-Paste `six_am_breakout.pine` into the Pine Editor, add it to a **5-minute**
-chart, and set the timezone input to your chart's timezone. The Pine version
-runs the same setup at every time in its session list (default: every hour
-00:00 to 13:00, plus 05:30 and 06:30). Each session's reference candle is the
-5-minute candle before it, and each trade runs until the next session in the
-list. It reverses between the session candle's high and low up to 2 times; the
-next cross after that closes the trade. All of these are inputs.
-A table in the top-right corner shows trades, win %, net profit and profit
-factor for each session time (closed trades, grouped by the session that
-opened them), plus a total row.
+Both scripts go on a **5-minute** chart with the timezone input set to your
+chart's timezone.
+
+- `six_am_breakout.pine`: strategy for **one session time** (default 14:00).
+  The reference candle is the 5-minute candle before it. Each trade is held
+  until the same time the next day and reverses between the session candle's
+  high and low up to 2 times; the next cross after that closes it. Trades show
+  in the Strategy Tester. Add it once per time to test several times.
+- `all_sessions.pine`: indicator that runs **every time in a list** (default:
+  every hour 00:00 to 13:00, plus 05:30 and 06:30), each one on its own, so
+  their trades can overlap. A table in the top-right corner shows trades,
+  win %, net points, net % and profit factor per session time, plus a total.
+  Set "Draw trades on the chart for this session" to see one time's trades.
 
 ## Usage (Python backtest)
 
