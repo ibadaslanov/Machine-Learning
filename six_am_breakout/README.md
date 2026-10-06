@@ -79,6 +79,8 @@ python -m six_am_breakout.backtest spx500.csv --sessions 16:00,17:00,18:00,19:00
 ```
 
 It adds long/short points, max drawdown and buy & hold for the same period.
+Use `--max-reversals N` (and `--hold-after`) to match the indicator's "Max
+reversals" and "Close the trade on the next cross" inputs.
 
 Options you will probably need:
 

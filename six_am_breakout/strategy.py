@@ -54,6 +54,10 @@ class Params:
     # Fill like TradingView's strategies (and the Pine indicator): stops fill when price
     # touches the level, and inside a bar price goes to the extreme nearest the open first.
     tradingview: bool = False
+    # Overrides mode when set: reverse up to this many times, then the next cross closes the
+    # trade (close_after) or it is held to the next session. Same as the Pine inputs.
+    max_reversals: int | None = None
+    close_after: bool = True
 
     def __post_init__(self):
         if self.mode not in MODES:
@@ -108,6 +112,8 @@ class _Simulator:
     def __init__(self, bars: pd.DataFrame, sessions: pd.DataFrame, p: Params):
         self.p = p
         self.max_flips, self.final_stop = MODES[p.mode]
+        if p.max_reversals is not None:
+            self.max_flips, self.final_stop = p.max_reversals, p.close_after
         self.times = bars.index
         self.o = bars["open"].to_numpy(float).tolist()
         self.h = bars["high"].to_numpy(float).tolist()

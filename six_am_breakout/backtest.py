@@ -40,11 +40,11 @@ def format_stats(results: dict) -> str:
     return pd.DataFrame({mode: r.stats for mode, r in results.items()}).map(_fmt).to_string()
 
 
-def session_table(bars, times, mode, tz, tradingview, cost_points):
+def session_table(bars, times, cost_points, **params):
     """Run each session time on its own (like the Pine indicator) and summarise closed trades."""
     rows, parts = {}, []
     for t in times:
-        r = run_backtest(bars, Params(t, tz, mode=mode, tradingview=tradingview))
+        r = run_backtest(bars, Params(t, **params))
         tr = r.trades[r.trades["exit_reason"] != "end_of_data"].copy()
         tr["session_time"] = t
         tr["net_points"] = tr["points"] - cost_points
@@ -146,6 +146,9 @@ def main():
     ap.add_argument("--sessions", help="comma-separated session times, each run on its own (per-session table)")
     ap.add_argument("--tradingview", action="store_true", help="fill like TradingView: on touch, nearest extreme first")
     ap.add_argument("--cost-points", type=float, default=0.0, help="cost per trade in points, for --sessions (default 0)")
+    ap.add_argument("--max-reversals", type=int, help="reverse up to N times per session (overrides --mode)")
+    ap.add_argument("--hold-after", action="store_true",
+                    help="with --max-reversals: hold after the last reversal instead of closing on the next cross")
     ap.add_argument("--out", default=str(Path(__file__).parent / "results"), help="output folder")
     args = ap.parse_args()
 
@@ -168,10 +171,14 @@ def main():
 
     if args.sessions:
         times = [t.strip() for t in args.sessions.split(",") if t.strip()]
-        table, trades = session_table(bars, times, args.mode, args.tz, args.tradingview, args.cost_points)
+        table, trades = session_table(bars, times, args.cost_points, tz=args.tz, mode=args.mode,
+                                      tradingview=args.tradingview, max_reversals=args.max_reversals,
+                                      close_after=not args.hold_after)
         hold = bars["close"].iloc[-1] - bars["open"].iloc[0]
+        rule = args.mode if args.max_reversals is None else (
+            f"max {args.max_reversals} reversals, then {'hold' if args.hold_after else 'close on next cross'}")
         print(f"{Path(args.csv).name}  |  {bars.index[0]:%Y-%m-%d} to {bars.index[-1]:%Y-%m-%d}  |  "
-              f"mode {args.mode}{'  |  TradingView fills' if args.tradingview else ''}  |  "
+              f"{rule}{'  |  TradingView fills' if args.tradingview else ''}  |  "
               f"cost {args.cost_points:g} points/trade  |  times in {args.tz}")
         print(table.map(_fmt).to_string())
         print(f"\nbuy & hold over the same period: {hold:+,.1f} points ({hold / bars['open'].iloc[0]:+.2%})")
