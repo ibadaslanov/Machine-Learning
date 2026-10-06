@@ -1,36 +1,48 @@
 //@version=6
-strategy("13:00 Breakout + Reverse", overlay = true, pyramiding = 0,
+strategy("Multi-session Breakout + Reverse", overlay = true, pyramiding = 0,
      default_qty_type = strategy.percent_of_equity, default_qty_value = 100, initial_capital = 10000)
 
 // Use on a 5-minute chart. Set the timezone to the one your chart shows.
 tz         = input.string("UTC", "Timezone (e.g. UTC, Asia/Baku, GMT+4)")
-sHour      = input.int(13, "Session hour", minval = 0, maxval = 23)
-sMinute    = input.int(0, "Session minute", minval = 0, maxval = 55, step = 5)
-maxRev     = input.int(2, "Max reversals per day", minval = 0)
+sessStr    = input.string("00:00,01:00,02:00,03:00,04:00,05:00,05:30,06:00,06:30,07:00,08:00,09:00,10:00,11:00,12:00,13:00",
+     "Session times (HH:MM, comma separated)")
+maxRev     = input.int(2, "Max reversals per session", minval = 0)
 closeAfter = input.bool(true, "Close the trade on the next cross after the last reversal (off = hold to next session)")
 
 if timeframe.in_seconds() != 300
     runtime.error("Use a 5-minute chart")
 
+// Session times in minutes of the day.
+var array<int> sessions = array.new<int>()
+if barstate.isfirst
+    for s in str.split(str.replace_all(sessStr, " ", ""), ",")
+        parts = str.split(s, ":")
+        if array.size(parts) != 2
+            runtime.error("Bad session time: " + s)
+        mins = int(str.tonumber(array.get(parts, 0))) * 60 + int(str.tonumber(array.get(parts, 1)))
+        if na(mins) or mins % 5 != 0
+            runtime.error("Bad session time: " + s)
+        array.push(sessions, mins)
+
 barT  = hour(time, tz) * 60 + minute(time, tz)
-sessT = sHour * 60 + sMinute
-isRef = barT == (sessT + 1435) % 1440   // the 12:55 candle
-isSig = barT == sessT                   // the 13:00 candle
+isRef = array.includes(sessions, (barT + 5) % 1440)   // the candle 5 minutes before a session
+isSig = array.includes(sessions, barT)                // the session candle
 
 var float refHigh  = na
 var float refLow   = na
 var float sigHigh  = na
 var float sigLow   = na
 var float revLevel = na
-var bool  active   = false              // today's setup is running
-var int   base     = 0                  // trade count when today's setup was armed
+var bool  active   = false              // current session's setup is running
+var int   base     = 0                  // trade count when the session was armed
 
 trades = strategy.closedtrades + strategy.opentrades
-n      = trades - base                  // entries today: first trade + each reversal
+n      = trades - base                  // entries this session: first trade + each reversal
 pos    = strategy.position_size
 
 if isRef
-    // 12:55 candle closed: close yesterday's trade at the 13:00 open and arm today's breakout.
+    // Reference candle closed: close the previous session's trade at the session open
+    // and arm this session's breakout.
     strategy.cancel_all()
     strategy.close_all(comment = "Next session")
     refHigh  := high
@@ -46,18 +58,18 @@ else if active
     if isSig
         sigHigh := high
         sigLow  := low
-    // Until the 13:00 candle closes, the reverse levels are the 12:55 high/low.
+    // Until the session candle closes, the reverse levels are the reference high/low.
     lvlHigh = na(sigHigh) ? refHigh : sigHigh
     lvlLow  = na(sigLow) ? refLow : sigLow
     if pos == 0
-        // No breakout in the 13:00 candle, or stopped out: done for today.
+        // No breakout in the session candle, or stopped out: done until the next session.
         strategy.cancel_all()
         active   := false
         revLevel := na
     else
         revLevel := pos > 0 ? lvlLow : lvlHigh
         if n - 1 < maxRev
-            // Reverse order: long -> sell stop at the 13:00 low, short -> buy stop at the 13:00 high.
+            // Reverse order: long -> sell stop at the session low, short -> buy stop at the session high.
             if pos > 0
                 strategy.entry("Short", strategy.short, stop = lvlLow, comment = "Reverse short")
             else
@@ -71,7 +83,7 @@ else if active
             else
                 revLevel := na
 
-plot(refHigh, "12:55 high", color.teal, 1, plot.style_stepline)
-plot(refLow, "12:55 low", color.red, 1, plot.style_stepline)
+plot(refHigh, "Reference high", color.teal, 1, plot.style_stepline)
+plot(refLow, "Reference low", color.red, 1, plot.style_stepline)
 plot(revLevel, "Reverse / stop", color.orange, 2, plot.style_linebr)
-bgcolor(isSig ? color.new(color.blue, 85) : na, title = "13:00 candle")
+bgcolor(isSig ? color.new(color.blue, 85) : na, title = "Session candle")

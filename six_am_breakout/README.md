@@ -40,9 +40,11 @@ runs it several ways (`--mode`, or `--compare` for all at once):
 
 Paste `six_am_breakout.pine` into the Pine Editor, add it to a **5-minute**
 chart, and set the timezone input to your chart's timezone. The Pine version
-defaults to **13:00** (12:55 reference candle). It keeps reversing between the
-13:00 high and low up to 2 times a day; the next cross after that closes the
-trade. Both are inputs.
+runs the same setup at every time in its session list (default: every hour
+00:00 to 13:00, plus 05:30 and 06:30). Each session's reference candle is the
+5-minute candle before it, and each trade runs until the next session in the
+list. It reverses between the session candle's high and low up to 2 times; the
+next cross after that closes the trade. All of these are inputs.
 
 ## Usage (Python backtest)
 
