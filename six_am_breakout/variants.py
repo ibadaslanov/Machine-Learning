@@ -16,13 +16,16 @@ BASE = dict(max_rev=4, close_after=True, tp=None, adds=0, add_step=2.0, hold_min
 
 
 def session_days(bars, hhmm):
+    """(session bar, next day's session bar) pairs. Works for any bar size: the reference
+    candle is the bar right before the session bar."""
     t = bars.index
+    step = t.to_series().diff().mode().iloc[0]
     mins = t.hour * 60 + t.minute
     sm = int(hhmm[:2]) * 60 + int(hhmm[3:])
     sig = np.flatnonzero(mins == sm)
     prev_ok = np.zeros(len(sig), bool)
     for n, i in enumerate(sig):
-        prev_ok[n] = i > 0 and (t[i] - t[i - 1]) == pd.Timedelta(minutes=5)
+        prev_ok[n] = i > 0 and (t[i] - t[i - 1]) == step
     days = []
     for n in range(len(sig)):  # the last day ends with the data; its open trade is not counted
         if prev_ok[n]:
@@ -40,7 +43,7 @@ def sim_day(o, h, l, c, tns, i0, i1, v):
 
     def close_all(px, i):
         p = st["pos"]
-        trades.append((sum(p * (px - e) for e in st["units"]), len(st["units"]), i))
+        trades.append((sum(p * (px - e) for e in st["units"]), len(st["units"]), i, p))
         st["pos"], st["units"] = 0, []
 
     def finish():
@@ -136,9 +139,10 @@ def run(bars, times, v, cost):
     rows = []
     for s in times:
         for i0, i1 in session_days(bars, s):
-            for pnl, units, ie in sim_day(o, h, l, c, tns, i0, i1, v):
-                rows.append((s, bars.index[i0], bars.index[min(ie, len(o) - 1)], pnl - cost * units, units))
-    return pd.DataFrame(rows, columns=["time", "session", "exit", "net", "units"])
+            for pnl, units, ie, side in sim_day(o, h, l, c, tns, i0, i1, v):
+                rows.append((s, bars.index[i0], bars.index[min(ie, len(o) - 1)], "long" if side > 0 else "short",
+                             pnl - cost * units, units))
+    return pd.DataFrame(rows, columns=["time", "session", "exit", "side", "net", "units"])
 
 
 def stats(tr):
@@ -168,7 +172,7 @@ def main():
 
     ap = argparse.ArgumentParser(description="Compare trade-management variants: tune on the part before --split, "
                                              "judge on the part after it.")
-    ap.add_argument("csv", help="5-minute OHLC bars")
+    ap.add_argument("csv", help="OHLC bars (5-minute, hourly, ...)")
     ap.add_argument("--sessions", required=True, help="comma-separated session times (UTC unless --data-tz)")
     ap.add_argument("--split", required=True, help="date that separates the tuning and test periods, YYYY-MM-DD")
     ap.add_argument("--cost", type=float, default=0.5, help="cost per unit in points (default 0.5)")

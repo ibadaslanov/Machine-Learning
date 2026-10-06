@@ -3,14 +3,14 @@ indicator("All Sessions Breakout + Reverse", overlay = true, max_labels_count = 
 
 // Every session time is traded on its own, like a separate strategy, so trades from
 // different times overlap (one can be long while another is short):
-// - the session candle breaks the previous 5-minute candle's high (long) or low (short);
+// - the session candle breaks the previous candle's high (long) or low (short);
 //   the first break cancels the other side and the trade runs until the session candle closes
 // - then a reverse order goes at the session candle's low (long) / high (short),
 //   up to "max reversals"; the next cross after that closes the trade
 // - optional: add a unit every "add step" x reference-candle range the trade moves in your favour
 // - no take profit: the trade is closed at the same time the next day
 // Results are in points (all units of a trade, after cost per unit), closed trades only.
-// Use on a 5-minute chart. Set the timezone to the one your chart shows.
+// Use on a 1- to 60-minute chart (e.g. 5-minute or 1-hour). Set the timezone to the one your chart shows.
 tz         = input.string("UTC", "Timezone (e.g. UTC, Asia/Baku, GMT+4)")
 sessStr    = input.string("08:30,11:00,11:30,13:00", "Session times (HH:MM, comma separated)")
 maxRev     = input.int(4, "Max reversals per session", minval = 0)
@@ -22,8 +22,9 @@ showFor    = input.string("all", "Draw trades on the chart: all, one session (e.
 tablePos   = input.string("Bottom right", "Table position",
      options = ["Top right", "Middle right", "Bottom right", "Top left", "Middle left", "Bottom left", "Top center", "Bottom center"])
 
-if timeframe.in_seconds() != 300
-    runtime.error("Use a 5-minute chart")
+if timeframe.in_seconds() > 3600 or 3600 % timeframe.in_seconds() != 0
+    runtime.error("Use a chart of 1 hour or less (1, 5, 15, 30 or 60 minutes)")
+tfMin = int(timeframe.in_seconds() / 60)
 
 var array<int>    sMin    = array.new<int>()
 var array<string> sName   = array.new<string>()
@@ -56,8 +57,8 @@ if barstate.isfirst
         if array.size(parts) != 2
             runtime.error("Bad session time: " + s)
         mins = int(str.tonumber(array.get(parts, 0))) * 60 + int(str.tonumber(array.get(parts, 1)))
-        if na(mins) or mins % 5 != 0
-            runtime.error("Bad session time: " + s)
+        if na(mins) or mins % tfMin != 0
+            runtime.error("Session time is not on a candle boundary: " + s)
         array.push(sMin, mins)
         array.push(sName, s)
         array.push(aPos, 0)
@@ -194,7 +195,7 @@ for k = 0 to array.size(sMin) - 1
         if array.get(aPos, k) != 0
             pts = closeTrade(k, open)
             mark(k, "Close " + str.tostring(pts, "+0.0;-0.0"), open, true, color.gray)
-        hasRef = prevT == (sm + 1435) % 1440
+        hasRef = prevT == (sm - tfMin + 1440) % 1440
         array.set(aRefH, k, high[1])
         array.set(aRefL, k, low[1])
         array.set(aBuy, k, hasRef ? high[1] : na)

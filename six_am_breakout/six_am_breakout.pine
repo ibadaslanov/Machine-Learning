@@ -7,22 +7,23 @@ strategy("Session Breakout + Reverse", overlay = true, pyramiding = 2,
 // One session time per strategy: each trade is held until the same time the next day.
 // For several times at once use all_sessions.pine (indicator with the profit table),
 // or add this strategy to the chart once per time.
-// Use on a 5-minute chart. Set the timezone to the one your chart shows.
+// Use on a 1- to 60-minute chart (e.g. 5-minute or 1-hour). Set the timezone to the one your chart shows.
 tz         = input.string("UTC", "Timezone (e.g. UTC, Asia/Baku, GMT+4)")
 sessTime   = input.string("14:00", "Session time (HH:MM)")
 maxRev     = input.int(2, "Max reversals per day", minval = 0)
 closeAfter = input.bool(true, "Close the trade on the next cross after the last reversal (off = hold to next day)")
 
-if timeframe.in_seconds() != 300
-    runtime.error("Use a 5-minute chart")
+if timeframe.in_seconds() > 3600 or 3600 % timeframe.in_seconds() != 0
+    runtime.error("Use a chart of 1 hour or less (1, 5, 15, 30 or 60 minutes)")
+tfMin = int(timeframe.in_seconds() / 60)
 
 parts = str.split(str.replace_all(sessTime, " ", ""), ":")
 sessT = int(str.tonumber(array.get(parts, 0))) * 60 + int(str.tonumber(array.get(parts, 1)))
-if na(sessT) or sessT % 5 != 0
-    runtime.error("Bad session time: " + sessTime)
+if na(sessT) or sessT % tfMin != 0
+    runtime.error("Session time is not on a candle boundary: " + sessTime)
 
 barT  = hour(time, tz) * 60 + minute(time, tz)
-isRef = barT == (sessT + 1435) % 1440   // the candle 5 minutes before the session
+isRef = barT == (sessT - tfMin + 1440) % 1440   // the candle before the session
 isSig = barT == sessT                   // the session candle
 
 var float refHigh  = na

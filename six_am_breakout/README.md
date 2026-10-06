@@ -38,8 +38,9 @@ runs it several ways (`--mode`, or `--compare` for all at once):
 
 ## TradingView
 
-Both scripts go on a **5-minute** chart with the timezone input set to your
-chart's timezone.
+Both scripts run on any chart from 1 to 60 minutes (5-minute or 1-hour) with
+the timezone input set to your chart's timezone. The reference candle is the
+candle right before the session time.
 
 - `six_am_breakout.pine`: strategy for **one session time** (default 14:00).
   The reference candle is the 5-minute candle before it. Each trade is held
