@@ -79,6 +79,10 @@ REVERSAL = [
             "flip_always",
             [("long", 101, 99.5, "reverse"), ("short", 99.5, 103, "reverse"), ("long", 103, 105, "session_close")],
         ),
+        (
+            "flip2_stop",
+            [("long", 101, 99.5, "reverse"), ("short", 99.5, 103, "reverse"), ("long", 103, 105, "session_close")],
+        ),
     ],
 )
 def test_reverse_order_modes(mode, expected):
@@ -86,7 +90,7 @@ def test_reverse_order_modes(mode, expected):
 
 
 def test_all_modes_covered():
-    assert set(MODES) == {"hold", "stop", "flip", "flip_stop", "flip_always"}
+    assert set(MODES) == {"hold", "stop", "flip", "flip_stop", "flip_always", "flip2_stop"}
 
 
 def test_no_reverse_inside_0600_candle():
@@ -110,6 +114,26 @@ def test_no_breakout_in_0600_candle_means_no_trade():
     r = run_backtest(bars_from(rows))
     assert r.trades.empty
     assert list(r.sessions["direction"]) == ["none"]
+
+
+def test_flip2_stop_closes_on_the_third_cross():
+    rows = REVERSAL[:4] + [
+        ("2026-10-05 06:15", 104, 104, 98, 98.5),  # through the 06:00 low again: stop, no third reversal
+        ("2026-10-05 06:20", 98.5, 110, 98.5, 110),
+    ]
+    r = run_backtest(bars_from(rows), Params(mode="flip2_stop"))
+    assert legs(r) == [("long", 101, 99.5, "reverse"), ("short", 99.5, 103, "reverse"), ("long", 103, 99.5, "stop")]
+
+
+def test_tradingview_fills_on_touch_and_goes_to_nearest_extreme_first():
+    rows = [
+        ("2026-10-05 05:55", 100, 101, 99, 100),
+        ("2026-10-05 06:00", 100, 101, 99, 100.5),  # touches both levels, high and low equally far from the open
+        ("2026-10-05 06:05", 100.5, 100.8, 100.2, 100.6),
+    ]
+    assert run_backtest(bars_from(rows)).trades.empty  # default: a touch does not fill
+    r = run_backtest(bars_from(rows), Params(tradingview=True))
+    assert legs(r) == [("long", 101, 100.6, "end_of_data")]  # high first, the short side is cancelled
 
 
 def test_gap_beyond_level_fills_at_open():

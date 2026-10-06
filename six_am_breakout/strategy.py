@@ -37,6 +37,7 @@ MODES = {
     "flip": (1, False),  # reverse once, the new trade holds to the next 06:00
     "flip_stop": (1, True),  # reverse once, the new trade is stopped at the other 06:00 extreme
     "flip_always": (None, False),  # keep reversing between the 06:00 high and low
+    "flip2_stop": (2, True),  # reverse twice, then the next cross closes it (the Pine scripts' default)
 }
 
 NAN = float("nan")
@@ -50,6 +51,9 @@ class Params:
     mode: str = "flip"
     fee: float = 0.0  # per side, as a fraction of notional
     slippage: float = 0.0  # per fill, as a fraction of price, always adverse
+    # Fill like TradingView's strategies (and the Pine indicator): stops fill when price
+    # touches the level, and inside a bar price goes to the extreme nearest the open first.
+    tradingview: bool = False
 
     def __post_init__(self):
         if self.mode not in MODES:
@@ -215,27 +219,29 @@ class _Simulator:
                 "gross_ret": gross,
                 "net_ret": gross - 2 * self.p.fee,
                 "r": side * (px - self.entry_px) / risk if risk > 0 else NAN,
+                "points": side * (px - self.entry_px),
             }
         )
         self.pos = 0
 
     def _simulate_bar(self, i):
         o, h, l, c = self.o[i], self.h[i], self.l[i], self.c[i]
-        if c > o:
+        tv = self.p.tradingview
+        if (tv or c == o) and h - o <= o - l:
+            path = (h, l, c)
+        elif tv or c == o:
             path = (l, h, c)
-        elif c < o:
-            path = (h, l, c)
-        elif h - o <= o - l:
-            path = (h, l, c)
+        elif c > o:
+            path = (l, h, c)
         else:
-            path = (l, h, c)
+            path = (h, l, c)
 
         fills = 0
-        # An order the bar opens beyond fills at the open.
+        # An order the bar opens beyond (or, TradingView-style, at) fills at the open.
         for _ in range(4):
-            if self.buy == self.buy and o > self.buy:
+            if self.buy == self.buy and (o > self.buy or tv and o == self.buy):
                 self._fill(1, o, i)
-            elif self.sell == self.sell and o < self.sell:
+            elif self.sell == self.sell and (o < self.sell or tv and o == self.sell):
                 self._fill(-1, o, i)
             else:
                 break
@@ -244,11 +250,12 @@ class _Simulator:
         px = o
         for target in path:
             for _ in range(4):
-                if target > px and self.buy == self.buy and px <= self.buy < target:
-                    px = self.buy
+                b, s = self.buy, self.sell
+                if target > px and b == b and px <= b and (b < target or tv and b == target):
+                    px = b
                     self._fill(1, px, i)
-                elif target < px and self.sell == self.sell and target < self.sell <= px:
-                    px = self.sell
+                elif target < px and s == s and s <= px and (s > target or tv and s == target):
+                    px = s
                     self._fill(-1, px, i)
                 else:
                     break
@@ -267,7 +274,7 @@ def run_backtest(bars: pd.DataFrame, p: Params = Params()) -> BacktestResult:
         sim.run(),
         columns=[
             "session", "side", "entry_time", "entry_price", "entry_reason",
-            "exit_time", "exit_price", "exit_reason", "gross_ret", "net_ret", "r",
+            "exit_time", "exit_price", "exit_reason", "gross_ret", "net_ret", "r", "points",
         ],
     )
 

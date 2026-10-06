@@ -70,6 +70,16 @@ TradingView "Export chart data", MetaTrader 5 exports and Binance files.
 Timestamps must be each bar's **open** time. 1-minute bars are best. 5-minute
 bars work, but they hide the order of moves inside a candle.
 
+To get the same table as the Pine indicator (each time on its own, TradingView
+fills, 2 reversals then stop, cost per trade in points):
+
+```bash
+python -m six_am_breakout.backtest spx500.csv --sessions 16:00,17:00,18:00,19:00 \
+    --mode flip2_stop --tradingview --cost-points 0.5
+```
+
+It adds long/short points, max drawdown and buy & hold for the same period.
+
 Options you will probably need:
 
 - `--tz Asia/Baku`: the timezone the 06:00 is in. Use your chart's timezone
