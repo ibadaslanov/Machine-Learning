@@ -9,7 +9,7 @@ indicator("All Sessions Breakout + Reverse", overlay = true, max_labels_count = 
 //   up to "max reversals"; the next cross after that closes the trade
 // - optional: add a unit every "add step" x reference-candle range the trade moves in your favour
 // - no take profit: the trade is closed at the same time the next day
-// Results are in points for 1 unit, closed trades only.
+// Results are in points (all units of a trade, after cost per unit), closed trades only.
 // Use on a 5-minute chart. Set the timezone to the one your chart shows.
 tz         = input.string("UTC", "Timezone (e.g. UTC, Asia/Baku, GMT+4)")
 sessStr    = input.string("08:30,11:00,11:30,13:00", "Session times (HH:MM, comma separated)")
