@@ -18,12 +18,13 @@ strategy("BETTA / GAMMA flip", shorttitle = "BETTA/GAMMA", overlay = true,
 //   - Short → go-long order at GAMMA's high.  Long → go-short order at BETTA's low.
 //   - After a flip, the next pivot is searched from the pivot we just used
 //     (BETTA is searched from GAMMA onward, GAMMA from BETTA onward).
-//   - Diffuser: 1 hour after BETTA, measure from BETTA's high to that candle's low.
+//   - Diffuser: 1 hour after BETTA (on 1-hour charts: the candle at the same hour on the
+//     next day), measure from BETTA's high to that candle's low.
 //     gap = max(10% of range, 3) + 1, and the order moves to that candle's low - gap.
-//     That candle becomes the new BETTA (inherited) and its 1-hour clock starts.
+//     That candle becomes the new BETTA (inherited) and its clock starts.
 //   - If a candle goes below the inherited BETTA's low without hitting the order,
 //     it starts a new BETTA (same BETTA rule). Once it is confirmed, the order moves
-//     to its low and the 1-hour clock restarts from it.
+//     to its low and the clock restarts from it.
 //   - Short side is the same, flipped (GAMMA's low to that candle's high, high + gap).
 //   - The diffuser only ever tightens the order. If the pivot is already older than
 //     1 hour when we enter, the entry candle is measured.
@@ -33,6 +34,8 @@ strategy("BETTA / GAMMA flip", shorttitle = "BETTA/GAMMA", overlay = true,
 // ─────────────────────────────────────────────────────────────────────────────
 
 startTime   = input.time(timestamp("01 Jan 2020 00:00 +0000"), "Start trading from")
+diffClock   = input.string("Auto", "Diffuser clock", options = ["Auto", "Minutes after pivot", "Same hour next day"],
+     tooltip = "Auto: minutes after pivot on charts below 1 hour, same hour next day on 1-hour charts and above.")
 diffMinutes = input.int(60, "Diffuser: minutes after pivot", minval = 1)
 diffPct     = input.float(10.0, "Diffuser: % of range", minval = 0)
 diffMin     = input.float(3.0, "Diffuser: minimum gap (points)", minval = 0)
@@ -43,7 +46,9 @@ tzIn        = input.string("Exchange", "Time zone", group = "Trading hours",
      tooltip = "Exchange = the symbol's own time zone. Or type one, for example UTC+2 or America/New_York.")
 tablePos    = input.string("Top right", "Profit table position", options = ["Top right", "Top left", "Bottom right", "Bottom left"])
 
-diffBars = math.max(1, math.round(diffMinutes * 60 / timeframe.in_seconds()))
+diffBars    = math.max(1, math.round(diffMinutes * 60 / timeframe.in_seconds()))
+nextDayMode = diffClock == "Same hour next day" or (diffClock == "Auto" and timeframe.in_seconds() >= 3600)
+tfMin       = math.round(timeframe.in_seconds() / 60)
 tick     = syminfo.mintick
 
 // Trading hours. canTrade is false outside the hours and on their last candle.
@@ -54,6 +59,9 @@ int endHHMM = int(str.tonumber(str.substring(sessionIn, 5, 9)))
 int endMin  = math.floor(endHHMM / 100) * 60 + endHHMM % 100
 lastSessBar = useHours and inSession and hour(time_close, tz) * 60 + minute(time_close, tz) == endMin
 canTrade    = inSession and not lastSessBar
+
+dateOf(int t)      => year(t, tz) * 10000 + month(t, tz) * 100 + dayofmonth(t, tz)
+minuteOfDay(int t) => hour(t, tz) * 60 + minute(t, tz)
 
 BETTA_COL = #2962FF
 GAMMA_COL = #FF9800
@@ -129,6 +137,8 @@ var Swing bot       = na     // BETTA tracker (next pivot when short)
 var float aHigh     = na
 var float aLow      = na
 var int   aBar      = na
+var int   aTime     = na     // time of that candle (for the next-day clock)
+var int   aTimeBar  = na
 var Swing pend      = na     // that pivot if it was still waiting for its confirming candle at entry
 var bool  inherited = false  // it came from the diffuser
 var Swing beyond    = na     // a new pivot forming beyond an inherited one
@@ -232,9 +242,22 @@ if time >= startTime
     if newPivot and bar_index - aBar <= 4900
         drawPivot(dir, aHigh, aLow, time[bar_index - aBar], stopLvl)
 
-    // 4) Diffuser: 1 hour after the pivot (or on the entry candle if it was older than that).
+    if not na(aBar) and (na(aTimeBar) or aBar != aTimeBar)
+        aTime    := time[math.min(bar_index - aBar, 4900)]
+        aTimeBar := aBar
+
+    // 4) Diffuser: 1 hour after the pivot (or on the entry candle if it was older than that),
+    //    or in next-day mode the candle at the same hour on a later day.
     //    This candle becomes the new, inherited pivot and its clock starts.
-    if dir != 0 and not na(aBar) and bar_index >= aBar + diffBars
+    bool due = false
+    if dir != 0 and not na(aBar)
+        if nextDayMode
+            int pMin = minuteOfDay(aTime)
+            int bMin = minuteOfDay(time)
+            due := dateOf(time) > dateOf(aTime) and bMin <= pMin and pMin < bMin + tfMin
+        else
+            due := bar_index >= aBar + diffBars
+    if due
         float ref = dir == 1 ? low : high
         float rng = math.abs(ref - (dir == 1 ? aHigh : aLow))
         float gap = math.max(rng * diffPct / 100, diffMin) + diffExtra
@@ -245,6 +268,8 @@ if time >= startTime
         aHigh     := high
         aLow      := low
         aBar      := bar_index
+        aTime     := time
+        aTimeBar  := bar_index
         inherited := true
         beyond    := na
         drawPivot(dir, high, low, time, stopLvl)
