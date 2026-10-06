@@ -1,5 +1,7 @@
 //@version=6
-strategy("Multi-session Breakout + Reverse", overlay = true, pyramiding = 0,
+// pyramiding = 2 so a new session's breakout order is accepted while the previous
+// session's trade (same direction) is still open; that trade closes at the session open.
+strategy("Multi-session Breakout + Reverse", overlay = true, pyramiding = 2,
      default_qty_type = strategy.percent_of_equity, default_qty_value = 100, initial_capital = 10000)
 
 // Use on a 5-minute chart. Set the timezone to the one your chart shows.
@@ -51,6 +53,9 @@ var int   base     = 0                  // trade count when the session was arme
 var int   curSess  = -1                 // index of the current session
 var array<int> tradeSess = array.new<int>()   // session index of every trade, in order
 var int   booked   = 0                  // closed trades already added to the table
+var int   sid      = 0                  // session counter, used to give each session its own order IDs
+idL = "L" + str.tostring(sid)
+idS = "S" + str.tostring(sid)
 
 trades = strategy.closedtrades + strategy.opentrades
 n      = trades - base                  // entries this session: first trade + each reversal
@@ -76,7 +81,9 @@ if isRef
     // Reference candle closed: close the previous session's trade at the session open
     // and arm this session's breakout.
     strategy.cancel_all()
-    strategy.close_all(comment = "Next session")
+    strategy.close(idL, comment = "Next session")
+    strategy.close(idS, comment = "Next session")
+    sid      += 1
     refHigh  := high
     refLow   := low
     sigHigh  := na
@@ -85,8 +92,8 @@ if isRef
     base     := trades
     active   := true
     curSess  := array.indexof(sessions, (barT + 5) % 1440)
-    strategy.entry("Long", strategy.long, stop = refHigh, comment = "Break high")
-    strategy.entry("Short", strategy.short, stop = refLow, comment = "Break low")
+    strategy.entry("L" + str.tostring(sid), strategy.long, stop = refHigh, comment = "Break high")
+    strategy.entry("S" + str.tostring(sid), strategy.short, stop = refLow, comment = "Break low")
 else if active
     if isSig
         sigHigh := high
@@ -104,13 +111,13 @@ else if active
         if n - 1 < maxRev
             // Reverse order: long -> sell stop at the session low, short -> buy stop at the session high.
             if pos > 0
-                strategy.entry("Short", strategy.short, stop = lvlLow, comment = "Reverse short")
+                strategy.entry(idS, strategy.short, stop = lvlLow, comment = "Reverse short")
             else
-                strategy.entry("Long", strategy.long, stop = lvlHigh, comment = "Reverse long")
+                strategy.entry(idL, strategy.long, stop = lvlHigh, comment = "Reverse long")
         else
             // Reversals used up: the next cross closes the trade (or hold if switched off).
-            strategy.cancel("Long")
-            strategy.cancel("Short")
+            strategy.cancel(idL)
+            strategy.cancel(idS)
             if closeAfter
                 strategy.exit("Stop", stop = revLevel, comment = "Stop")
             else
@@ -118,7 +125,7 @@ else if active
 
 plot(refHigh, "Reference high", color.teal, 1, plot.style_stepline)
 plot(refLow, "Reference low", color.red, 1, plot.style_stepline)
-plot(revLevel, "Reverse / stop", color.orange, 2, plot.style_linebr)
+plot(revLevel, "Reverse / stop", color.orange, 2, plot.style_steplinebr)
 bgcolor(isSig ? color.new(color.blue, 85) : na, title = "Session candle")
 
 // ---- Profit table: closed trades grouped by the session that opened them ----
