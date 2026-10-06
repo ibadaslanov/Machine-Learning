@@ -31,6 +31,8 @@ strategy("BETTA / GAMMA flip", shorttitle = "BETTA/GAMMA", overlay = true,
 //   - A tie (equal high / low) is not a break, so orders sit one tick beyond the level.
 //   - Trading hours (optional): orders are only active inside the hours. Outside them
 //     the position stays open with no orders, and BETTA / GAMMA keep updating.
+//   - Fewer flips (optional): a buffer puts the order some points beyond BETTA / GAMMA,
+//     and "flip only on candle close" needs a close beyond the level (filled next open).
 // ─────────────────────────────────────────────────────────────────────────────
 
 startTime   = input.time(timestamp("01 Jan 2020 00:00 +0000"), "Start trading from")
@@ -40,6 +42,10 @@ diffMinutes = input.int(60, "Diffuser: minutes after pivot", minval = 1)
 diffPct     = input.float(10.0, "Diffuser: % of range", minval = 0)
 diffMin     = input.float(3.0, "Diffuser: minimum gap (points)", minval = 0)
 diffExtra   = input.float(1.0, "Diffuser: extra (points)", minval = 0)
+flipBuf     = input.float(0.0, "Flip buffer (points)", minval = 0, group = "Fewer flips",
+     tooltip = "The order sits this many points beyond BETTA / GAMMA, so small wicks don't flip the trade.")
+closeOnly   = input.bool(false, "Flip only on candle close", group = "Fewer flips",
+     tooltip = "A candle has to close beyond BETTA / GAMMA. The trade is filled at the next candle's open.")
 useHours    = input.bool(false, "Only trade in these hours", group = "Trading hours")
 sessionIn   = input.session("0900-1700", "Hours", group = "Trading hours")
 tzIn        = input.string("Exchange", "Time zone", group = "Trading hours",
@@ -124,6 +130,9 @@ method feedActive(Swing s, float h, float l, int bi) =>
             s.confirmAt(h, l, bi)
     s
 
+// Flip price for a BETTA (d = 1) or GAMMA (d = -1) candle, with the buffer.
+pivotStop(int d, float h, float l) => d == 1 ? l - flipBuf : h + flipBuf
+
 // "BETTA" (d = 1) or "GAMMA" (d = -1) written on the candle at time t.
 drawPivot(int d, float h, float l, int t, float orderPx) =>
     color c = d == 1 ? BETTA_COL : GAMMA_COL
@@ -147,15 +156,23 @@ var float stopLvl   = na     // flip price: go short below it when long, go long
 var bool  byDiff    = false  // stopLvl was set by the diffuser
 var float goLong    = na
 var float goShort   = na
+var int   fillNext  = 0      // close-only mode: label the market fill on the next candle
 
 if time >= startTime
     if na(top)
         top := Swing.new(true)
         bot := Swing.new(false)
 
+    if fillNext != 0
+        label.new(x = bar_index, y = fillNext == 1 ? low : high, text = (fillNext == 1 ? "BUY " : "SELL ") + str.tostring(open, format.mintick),
+             yloc = fillNext == 1 ? yloc.belowbar : yloc.abovebar, color = fillNext == 1 ? BUY_COL : SELL_COL, textcolor = color.white,
+             size = size.small, style = fillNext == 1 ? label.style_label_up : label.style_label_down)
+        fillNext := 0
+
     // 1) Did the order placed on the previous candle trade? (strict break, see ties)
-    bool longHit  = dir <= 0 and not na(goLong)  and high > goLong
-    bool shortHit = dir >= 0 and not na(goShort) and low  < goShort
+    //    Close-only mode needs the close beyond the level, and the next candle inside the hours.
+    bool longHit  = dir <= 0 and not na(goLong)  and (closeOnly ? close > goLong and canTrade : high > goLong)
+    bool shortHit = dir >= 0 and not na(goShort) and (closeOnly ? close < goShort and canTrade : low < goShort)
     int  flip     = 0
     if dir == 0
         flip := longHit and shortHit ? (high - open <= open - low ? 1 : -1) : longHit ? 1 : shortHit ? -1 : 0
@@ -177,11 +194,15 @@ if time >= startTime
     // 3) Flip: the tracked pivot starts guarding the position, and the next one is searched from it.
     if flip != 0
         // Executed order and its price. A flip closes the old position and opens the new one.
-        float  fill = flip == 1 ? math.max(open, goLong + tick) : math.min(open, goShort - tick)
-        string txt  = (flip == 1 ? "BUY " : "SELL ") + str.tostring(fill, format.mintick)
-        label.new(x = bar_index, y = flip == 1 ? low : high, text = txt, yloc = flip == 1 ? yloc.belowbar : yloc.abovebar,
-             color = flip == 1 ? BUY_COL : SELL_COL, textcolor = color.white, size = size.small,
-             style = flip == 1 ? label.style_label_up : label.style_label_down)
+        // In close-only mode the market order fills at the next open, so it is labelled then.
+        if closeOnly
+            fillNext := flip
+        else
+            float  fill = flip == 1 ? math.max(open, goLong + tick) : math.min(open, goShort - tick)
+            string txt  = (flip == 1 ? "BUY " : "SELL ") + str.tostring(fill, format.mintick)
+            label.new(x = bar_index, y = flip == 1 ? low : high, text = txt, yloc = flip == 1 ? yloc.belowbar : yloc.abovebar,
+                 color = flip == 1 ? BUY_COL : SELL_COL, textcolor = color.white, size = size.small,
+                 style = flip == 1 ? label.style_label_up : label.style_label_down)
         dir       := flip
         inherited := false
         beyond    := na
@@ -202,14 +223,14 @@ if time >= startTime
             aLow     := src.pLow
             aBar     := src.pBar
             pend     := na
-            stopLvl  := flip == 1 ? aLow : aHigh
+            stopLvl  := pivotStop(flip, aHigh, aLow)
             newPivot := true
         else
             aHigh   := na
             aLow    := na
             aBar    := na
             pend    := src
-            stopLvl := flip == 1 ? src.exLow : src.exHigh
+            stopLvl := pivotStop(flip, src.exHigh, src.exLow)
     else if dir != 0
         if not na(pend)
             // The pivot we entered with gets its confirming candle.
@@ -219,7 +240,7 @@ if time >= startTime
                 aLow     := pend.pLow
                 aBar     := pend.pBar
                 pend     := na
-                stopLvl  := dir == 1 ? math.max(stopLvl, aLow) : math.min(stopLvl, aHigh)
+                stopLvl  := dir == 1 ? math.max(stopLvl, pivotStop(1, aHigh, aLow)) : math.min(stopLvl, pivotStop(-1, aHigh, aLow))
                 byDiff   := false
                 newPivot := true
         else if inherited
@@ -236,7 +257,7 @@ if time >= startTime
                 aBar      := beyond.pBar
                 inherited := false
                 beyond    := na
-                stopLvl   := dir == 1 ? aLow : aHigh
+                stopLvl   := dir == 1 ? math.max(stopLvl, pivotStop(1, aHigh, aLow)) : math.min(stopLvl, pivotStop(-1, aHigh, aLow))
                 byDiff    := false
                 newPivot  := true
 
@@ -283,12 +304,20 @@ if time >= startTime
         goShort := na
         goLong  := stopLvl
     else
-        goLong  := top.confirmed ? top.pHigh : na
-        goShort := bot.confirmed ? bot.pLow : na
+        goLong  := top.confirmed ? pivotStop(-1, top.pHigh, top.pLow) : na
+        goShort := bot.confirmed ? pivotStop(1, bot.pHigh, bot.pLow) : na
 
     // 6) Orders, one tick beyond the level so an exact touch doesn't fill.
     //    Outside the trading hours there are no orders; an open position just stays open.
-    if not canTrade
+    //    Close-only mode sends a market order on the flip candle instead of stop orders.
+    if closeOnly
+        if flip != 0
+            strategy.entry(flip == 1 ? "Long" : "Short", flip == 1 ? strategy.long : strategy.short,
+                 comment = flip == 1 ? "Long (close)" : "Short (close)")
+        if not canTrade
+            goLong  := na
+            goShort := na
+    else if not canTrade
         strategy.cancel_all()
         goLong  := na
         goShort := na
