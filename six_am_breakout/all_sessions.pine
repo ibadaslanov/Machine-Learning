@@ -7,15 +7,17 @@ indicator("All Sessions Breakout + Reverse", overlay = true, max_labels_count = 
 //   the first break cancels the other side and the trade runs until the session candle closes
 // - then a reverse order goes at the session candle's low (long) / high (short),
 //   up to "max reversals"; the next cross after that closes the trade
+// - optional: add a unit every "add step" x reference-candle range the trade moves in your favour
 // - no take profit: the trade is closed at the same time the next day
 // Results are in points for 1 unit, closed trades only.
 // Use on a 5-minute chart. Set the timezone to the one your chart shows.
 tz         = input.string("UTC", "Timezone (e.g. UTC, Asia/Baku, GMT+4)")
-sessStr    = input.string("00:00,01:00,02:00,03:00,04:00,05:00,05:30,06:00,06:30,07:00,08:00,09:00,10:00,11:00,12:00,13:00",
-     "Session times (HH:MM, comma separated)")
-maxRev     = input.int(2, "Max reversals per session", minval = 0)
+sessStr    = input.string("08:30,11:00,11:30,13:00", "Session times (HH:MM, comma separated)")
+maxRev     = input.int(4, "Max reversals per session", minval = 0)
 closeAfter = input.bool(true, "Close the trade on the next cross after the last reversal (off = hold to next day)")
-cost       = input.float(0.0, "Cost per trade in points (spread + commission)", minval = 0)
+maxAdds    = input.int(2, "Add units: max extra units per trade (0 = off)", minval = 0)
+addStep    = input.float(2.0, "Add a unit every N x reference-candle range in profit", minval = 0.1, step = 0.5)
+cost       = input.float(0.5, "Cost per unit in points (spread + commission)", minval = 0)
 showFor    = input.string("all", "Draw trades on the chart: all, one session (e.g. 14:00), or none")
 tablePos   = input.string("Bottom right", "Table position",
      options = ["Top right", "Middle right", "Bottom right", "Top left", "Middle left", "Bottom left", "Top center", "Bottom center"])
@@ -27,7 +29,9 @@ var array<int>    sMin    = array.new<int>()
 var array<string> sName   = array.new<string>()
 // trade state per session
 var array<int>    aPos    = array.new<int>()      // 1 long, -1 short, 0 flat
-var array<float>  aEntry  = array.new<float>()
+var array<int>    aUnits  = array.new<int>()      // units in the open trade
+var array<float>  aSumE   = array.new<float>()    // sum of the units' entry prices
+var array<float>  aAdd    = array.new<float>()    // next add level, na = none
 var array<int>    aRevs   = array.new<int>()
 var array<bool>   aWin    = array.new<bool>()     // session candle still forming
 var array<bool>   aActive = array.new<bool>()     // orders may be pending
@@ -57,7 +61,9 @@ if barstate.isfirst
         array.push(sMin, mins)
         array.push(sName, s)
         array.push(aPos, 0)
-        array.push(aEntry, na)
+        array.push(aUnits, 0)
+        array.push(aSumE, 0.0)
+        array.push(aAdd, na)
         array.push(aRevs, 0)
         array.push(aWin, false)
         array.push(aActive, false)
@@ -85,13 +91,15 @@ mark(int k, string txt, float price, bool above, color c) =>
         label.new(bar_index, price, array.get(sName, k) + " " + txt, yloc = yloc.price, color = c,
              textcolor = color.white, size = size.tiny, style = above ? label.style_label_down : label.style_label_up)
 
+// Points for all units of the trade, after cost per unit.
 closeTrade(int k, float px) =>
     side  = array.get(aPos, k)
-    entry = array.get(aEntry, k)
-    pts   = side * (px - entry) - cost
+    units = array.get(aUnits, k)
+    sumE  = array.get(aSumE, k)
+    pts   = side * (units * px - sumE) - cost * units
     array.set(rTrades, k, array.get(rTrades, k) + 1)
     array.set(rPts, k, array.get(rPts, k) + pts)
-    array.set(rPct, k, array.get(rPct, k) + 100 * pts / entry)
+    array.set(rPct, k, array.get(rPct, k) + 100 * pts / (sumE / units))
     if pts > 0
         array.set(rWins, k, array.get(rWins, k) + 1)
         array.set(rGW, k, array.get(rGW, k) + pts)
@@ -100,33 +108,47 @@ closeTrade(int k, float px) =>
     array.set(aPos, k, 0)
     pts
 
-// Reverse (or stop) order for the open trade: long -> sell stop at the session candle's low,
-// short -> buy stop at its high. None while the session candle is still forming.
+// Orders for the open trade. Reverse (or stop): long -> sell stop at the session candle's low,
+// short -> buy stop at its high, none while the session candle is still forming.
+// Add: long -> buy stop above, short -> sell stop below.
 placeExit(int k) =>
     p = array.get(aPos, k)
-    array.set(aBuy, k, na)
-    array.set(aSell, k, na)
+    exitLvl = float(na)
     if not array.get(aWin, k) and (array.get(aRevs, k) < maxRev or closeAfter)
-        if p > 0
-            array.set(aSell, k, array.get(aSigL, k))
-        else if p < 0
-            array.set(aBuy, k, array.get(aSigH, k))
+        exitLvl := p > 0 ? array.get(aSigL, k) : array.get(aSigH, k)
+    addLvl = array.get(aAdd, k)
+    array.set(aBuy, k, p > 0 ? addLvl : exitLvl)
+    array.set(aSell, k, p > 0 ? exitLvl : addLvl)
+
+openPos(int k, int side, float px) =>
+    r = math.max(array.get(aRefH, k) - array.get(aRefL, k), syminfo.mintick)
+    array.set(aPos, k, side)
+    array.set(aUnits, k, 1)
+    array.set(aSumE, k, px)
+    array.set(aAdd, k, maxAdds > 0 ? px + side * addStep * r : na)
+    placeExit(k)
 
 doFill(int k, int side, float px) =>
     txt = side > 0 ? "Buy" : "Sell"
     c   = side > 0 ? color.teal : color.red
-    if array.get(aPos, k) == 0
-        array.set(aPos, k, side)
-        array.set(aEntry, k, px)
+    p   = array.get(aPos, k)
+    if p == 0
+        openPos(k, side, px)
         mark(k, txt, px, side < 0, c)
+    else if p == side
+        // add a unit to the winning trade
+        r = math.max(array.get(aRefH, k) - array.get(aRefL, k), syminfo.mintick)
+        n = array.get(aUnits, k) + 1
+        array.set(aUnits, k, n)
+        array.set(aSumE, k, array.get(aSumE, k) + px)
+        array.set(aAdd, k, n - 1 < maxAdds ? px + side * addStep * r : na)
+        mark(k, "Add " + str.tostring(n), px, side < 0, c)
         placeExit(k)
     else if array.get(aRevs, k) < maxRev
         pts = closeTrade(k, px)
-        array.set(aPos, k, side)
-        array.set(aEntry, k, px)
         array.set(aRevs, k, array.get(aRevs, k) + 1)
+        openPos(k, side, px)
         mark(k, "Rev " + txt + " " + str.tostring(pts, "+0.0;-0.0"), px, side < 0, c)
-        placeExit(k)
     else
         pts = closeTrade(k, px)
         mark(k, "Stop " + str.tostring(pts, "+0.0;-0.0"), px, side < 0, color.gray)
@@ -178,6 +200,9 @@ for k = 0 to array.size(sMin) - 1
         array.set(aBuy, k, hasRef ? high[1] : na)
         array.set(aSell, k, hasRef ? low[1] : na)
         array.set(aRevs, k, 0)
+        array.set(aUnits, k, 0)
+        array.set(aSumE, k, 0.0)
+        array.set(aAdd, k, na)
         array.set(aWin, k, true)
         array.set(aActive, k, hasRef)
     if array.get(aActive, k)

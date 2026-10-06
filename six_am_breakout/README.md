@@ -52,6 +52,17 @@ chart's timezone.
   their trades can overlap. A table in the top-right corner shows trades,
   win %, net points, net % and profit factor per session time, plus a total.
   Set "Draw trades on the chart for this session" to see one time's trades.
+  "Add units" adds a unit each time the trade moves N x the reference
+  candle's range in your favour (default: up to 2 extra units every 2x);
+  set it to 0 to trade one unit.
+
+To compare trade-management variants (take profit, holding time, adding
+units, break-even, trailing stop, number of reversals), tuned on one period
+and judged on the next:
+
+```bash
+python -m six_am_breakout.variants spx500.csv --sessions 08:30,11:00,11:30,13:00 --split 2026-02-01
+```
 
 ## Usage (Python backtest)
 
