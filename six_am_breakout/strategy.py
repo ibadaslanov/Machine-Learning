@@ -6,9 +6,9 @@ Rules (times are in the strategy timezone, candles are 5 minutes):
 2. At 06:00 a buy stop goes at H and a sell stop at L. The first one to fill
    cancels the other. If neither fills during the 06:00 candle there is no
    trade that day.
-3. Reverse order: once long, a sell stop sits at the low of the 06:00 candle
-   (a buy stop at its high once short). That low is only known when the
-   candle closes at 06:05, so until then the order sits at L (H for a short).
+3. Reverse order: once the 06:00 candle has closed, a long gets a sell stop at
+   that candle's low (a short gets a buy stop at its high). Inside the 06:00
+   candle there is no reverse order, so the trade cannot be shaken out there.
    What happens when it fills depends on the mode (see MODES).
 4. No take profit. Whatever is open at the next session's 06:00 is closed at
    that bar's open and the new setup starts. Days without data (weekends,
@@ -153,14 +153,12 @@ class _Simulator:
         self.sell = self.s.at[k, "ref_low"]
 
     def _close_window(self):
-        """The 06:00 candle has closed: drop unfilled entries, move the reverse order."""
+        """The 06:00 candle has closed: drop unfilled entries, place the reverse order."""
         self.in_window = False
         if self.pos == 0:
             self.buy = self.sell = NAN
-        elif self.pos == 1 and self.sell == self.sell:
-            self.sell = self.s.at[self.cur, "sig_low"]
-        elif self.pos == -1 and self.buy == self.buy:
-            self.buy = self.s.at[self.cur, "sig_high"]
+        else:
+            self._place_exit_order()
 
     # -- orders and fills --------------------------------------------------
 
@@ -172,13 +170,13 @@ class _Simulator:
 
     def _place_exit_order(self):
         self.buy = self.sell = NAN
-        if not (self._can_flip() or self.final_stop):
+        if self.in_window or not (self._can_flip() or self.final_stop):
             return
         k = self.cur
         if self.pos == 1:
-            self.sell = self.s.at[k, "ref_low" if self.in_window else "sig_low"]
+            self.sell = self.s.at[k, "sig_low"]
         else:
-            self.buy = self.s.at[k, "ref_high" if self.in_window else "sig_high"]
+            self.buy = self.s.at[k, "sig_high"]
 
     def _fill(self, side, level, i):
         px = self._px(level, side)

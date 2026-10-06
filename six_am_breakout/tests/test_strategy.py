@@ -89,15 +89,16 @@ def test_all_modes_covered():
     assert set(MODES) == {"hold", "stop", "flip", "flip_stop", "flip_always"}
 
 
-def test_reverse_inside_0600_candle_uses_0555_low():
+def test_no_reverse_inside_0600_candle():
     rows = [
         ("2026-10-05 05:55", 100, 101, 99, 100),
-        ("2026-10-05 06:00", 100, 102, 98, 98.5),  # up through 101, then down through 99
-        ("2026-10-05 06:05", 98.5, 99, 98, 98.5),
+        ("2026-10-05 06:00", 100, 102, 98, 98.5),  # up through 101, then down through 99: stays long
+        ("2026-10-05 06:05", 98.5, 99, 98, 98.5),  # only touches the 06:00 low (98)
+        ("2026-10-05 06:10", 98.5, 98.6, 97, 97.5),  # through the 06:00 low
     ]
     r = run_backtest(bars_from(rows))
-    assert legs(r) == [("long", 101, 99, "reverse"), ("short", 99, 98.5, "end_of_data")]
-    assert r.stats["bars with 2+ fills"] == 1
+    assert legs(r) == [("long", 101, 98, "reverse"), ("short", 98, 97.5, "end_of_data")]
+    assert r.stats["bars with 2+ fills"] == 0
 
 
 def test_no_breakout_in_0600_candle_means_no_trade():
@@ -126,7 +127,7 @@ def test_one_minute_bars_build_the_5_minute_candles():
     rows += [
         ("2026-10-05 06:00", 100, 100.8, 99.8, 100.5),
         ("2026-10-05 06:01", 100.5, 101.5, 100.4, 101.2),  # long at 101
-        ("2026-10-05 06:02", 101.2, 101.3, 99.6, 99.7),  # 06:00 low so far 99.6, reverse still at 99
+        ("2026-10-05 06:02", 101.2, 101.3, 99.6, 99.7),  # no reverse order until the 06:00 candle closes
         ("2026-10-05 06:03", 99.7, 100, 99.7, 100),
         ("2026-10-05 06:04", 100, 100.2, 100, 100.1),
         ("2026-10-05 06:05", 100.1, 100.1, 99.5, 99.5),  # through the 06:00 low (99.6)

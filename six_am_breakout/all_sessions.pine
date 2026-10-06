@@ -3,8 +3,10 @@ indicator("All Sessions Breakout + Reverse", overlay = true, max_labels_count = 
 
 // Every session time is traded on its own, like a separate strategy, so trades from
 // different times overlap (one can be long while another is short):
-// - the session candle breaks the previous 5-minute candle's high (long) or low (short)
-// - reverse at the session candle's low/high, up to "max reversals"; the next cross then closes it
+// - the session candle breaks the previous 5-minute candle's high (long) or low (short);
+//   the first break cancels the other side and the trade runs until the session candle closes
+// - then a reverse order goes at the session candle's low (long) / high (short),
+//   up to "max reversals"; the next cross after that closes the trade
 // - no take profit: the trade is closed at the same time the next day
 // Results are in points for 1 unit, closed trades only.
 // Use on a 5-minute chart. Set the timezone to the one your chart shows.
@@ -98,18 +100,17 @@ closeTrade(int k, float px) =>
     array.set(aPos, k, 0)
     pts
 
-// Reverse (or stop) order for the open trade: long -> sell stop at the low, short -> buy stop at the high.
-// While the session candle is forming the levels are the reference candle's low/high.
+// Reverse (or stop) order for the open trade: long -> sell stop at the session candle's low,
+// short -> buy stop at its high. None while the session candle is still forming.
 placeExit(int k) =>
     p = array.get(aPos, k)
-    w = array.get(aWin, k)
     array.set(aBuy, k, na)
     array.set(aSell, k, na)
-    if array.get(aRevs, k) < maxRev or closeAfter
+    if not array.get(aWin, k) and (array.get(aRevs, k) < maxRev or closeAfter)
         if p > 0
-            array.set(aSell, k, w ? array.get(aRefL, k) : array.get(aSigL, k))
+            array.set(aSell, k, array.get(aSigL, k))
         else if p < 0
-            array.set(aBuy, k, w ? array.get(aRefH, k) : array.get(aSigH, k))
+            array.set(aBuy, k, array.get(aSigH, k))
 
 doFill(int k, int side, float px) =>
     txt = side > 0 ? "Buy" : "Sell"
@@ -183,19 +184,16 @@ for k = 0 to array.size(sMin) - 1
         simBar(k)
     if isSig
         // Session candle closed: no breakout means no trade today,
-        // otherwise the reverse order moves to the session candle's low/high.
+        // otherwise the reverse order goes at the session candle's low/high.
         array.set(aWin, k, false)
         array.set(aSigH, k, high)
         array.set(aSigL, k, low)
-        p = array.get(aPos, k)
-        if p == 0
+        if array.get(aPos, k) == 0
             array.set(aBuy, k, na)
             array.set(aSell, k, na)
             array.set(aActive, k, false)
-        else if p > 0 and not na(array.get(aSell, k))
-            array.set(aSell, k, low)
-        else if p < 0 and not na(array.get(aBuy, k))
-            array.set(aBuy, k, high)
+        else
+            placeExit(k)
 
 // ---- Profit table ----
 

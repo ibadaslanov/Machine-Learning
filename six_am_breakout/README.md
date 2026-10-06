@@ -9,11 +9,11 @@ A daily breakout strategy built around one candle: the 05:55 candle on the
 2. **Entry:** at 06:00 place a buy stop at H and a sell stop at L. The first
    one to fill cancels the other. If price crosses neither during the 06:00
    candle (06:00 to 06:05), there is no trade that day.
-3. **Reverse order:** once long, a sell stop sits at the **low of the 06:00
-   candle**. Once short, a buy stop sits at its high. That low is only known
-   when the candle closes at 06:05, so until then the order sits at the 05:55
-   low (the 05:55 high for a short). When it fills, it closes the trade and
-   opens the opposite one.
+3. **Reverse order:** once the 06:00 candle has closed, a long gets a sell
+   stop at the **low of the 06:00 candle** and a short gets a buy stop at its
+   high. Inside the 06:00 candle there is no reverse order, so the trade can't
+   be shaken out there. When it fills, it closes the trade and opens the
+   opposite one.
 4. **Exit:** no take profit. Whatever is open at the next day's 06:00 is closed
    and the new setup starts. Weekends and holidays without data are skipped, so
    a Friday trade runs to Monday's 06:00.
@@ -43,8 +43,9 @@ chart's timezone.
 
 - `six_am_breakout.pine`: strategy for **one session time** (default 14:00).
   The reference candle is the 5-minute candle before it. Each trade is held
-  until the same time the next day and reverses between the session candle's
-  high and low up to 2 times; the next cross after that closes it. Trades show
+  until the same time the next day. Once the session candle has closed, the
+  trade reverses between that candle's high and low up to 2 times; the next
+  cross after that closes it. Trades show
   in the Strategy Tester. Add it once per time to test several times.
 - `all_sessions.pine`: indicator that runs **every time in a list** (default:
   every hour 00:00 to 13:00, plus 05:30 and 06:30), each one on its own, so

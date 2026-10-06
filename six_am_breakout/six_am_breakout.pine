@@ -53,13 +53,18 @@ if isRef
     revLevel := na
     base     := trades
     active   := true
-    strategy.entry("L" + str.tostring(sid), strategy.long, stop = refHigh, comment = "Break high")
-    strategy.entry("S" + str.tostring(sid), strategy.short, stop = refLow, comment = "Break low")
+    // One-cancels-other: the first break cancels the other side, so nothing reverses
+    // inside the session candle.
+    oca = "Break " + str.tostring(sid)
+    strategy.entry("L" + str.tostring(sid), strategy.long, stop = refHigh, comment = "Break high",
+         oca_name = oca, oca_type = strategy.oca.cancel)
+    strategy.entry("S" + str.tostring(sid), strategy.short, stop = refLow, comment = "Break low",
+         oca_name = oca, oca_type = strategy.oca.cancel)
 else if active
     if isSig
         sigHigh := high
         sigLow  := low
-    // Until the session candle closes, the reverse levels are the reference high/low.
+    // The reverse order goes at the session candle's high/low once that candle has closed.
     lvlHigh = na(sigHigh) ? refHigh : sigHigh
     lvlLow  = na(sigLow) ? refLow : sigLow
     if pos == 0
