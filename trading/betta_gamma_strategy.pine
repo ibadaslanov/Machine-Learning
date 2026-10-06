@@ -29,8 +29,8 @@ strategy("BETTA / GAMMA flip", shorttitle = "BETTA/GAMMA", overlay = true,
 //   - The diffuser only ever tightens the order. If the pivot is already older than
 //     1 hour when we enter, the entry candle is measured.
 //   - A tie (equal high / low) is not a break, so orders sit one tick beyond the level.
-//   - Trading hours (optional): orders only inside the hours. The position is closed
-//     on the last candle of the hours, and the next day starts flat again.
+//   - Trading hours (optional): orders are only active inside the hours. Outside them
+//     the position stays open with no orders, and BETTA / GAMMA keep updating.
 // ─────────────────────────────────────────────────────────────────────────────
 
 startTime   = input.time(timestamp("01 Jan 2020 00:00 +0000"), "Start trading from")
@@ -49,25 +49,26 @@ tablePos    = input.string("Top right", "Profit table position", options = ["Top
 diffBars    = math.max(1, math.round(diffMinutes * 60 / timeframe.in_seconds()))
 nextDayMode = diffClock == "Same hour next day" or (diffClock == "Auto" and timeframe.in_seconds() >= 3600)
 tfMin       = math.round(timeframe.in_seconds() / 60)
-tick     = syminfo.mintick
-
-// Trading hours. canTrade is false outside the hours and on their last candle.
+tick        = syminfo.mintick
 tz          = tzIn == "Exchange" or tzIn == "" ? syminfo.timezone : tzIn
-sessTime    = time(timeframe.period, sessionIn, tz)
-inSession   = not useHours or not na(sessTime)
-int endHHMM = int(str.tonumber(str.substring(sessionIn, 5, 9)))
-int endMin  = math.floor(endHHMM / 100) * 60 + endHHMM % 100
-lastSessBar = useHours and inSession and hour(time_close, tz) * 60 + minute(time_close, tz) == endMin
-canTrade    = inSession and not lastSessBar
 
 dateOf(int t)      => year(t, tz) * 10000 + month(t, tz) * 100 + dayofmonth(t, tz)
 minuteOfDay(int t) => hour(t, tz) * 60 + minute(t, tz)
+hhmmToMin(string hhmm) =>
+    int v = int(str.tonumber(hhmm))
+    math.floor(v / 100) * 60 + v % 100
+
+// Trading hours. Orders placed now are live during the next candle, so they are only
+// placed when the next candle starts inside the hours.
+int startMin = hhmmToMin(str.substring(sessionIn, 0, 4))
+int endMin   = hhmmToMin(str.substring(sessionIn, 5, 9))
+int nextMin  = minuteOfDay(time_close)
+canTrade     = not useHours or (startMin <= endMin ? nextMin >= startMin and nextMin < endMin : nextMin >= startMin or nextMin < endMin)
 
 BETTA_COL = #2962FF
 GAMMA_COL = #FF9800
 BUY_COL   = #089981
 SELL_COL  = #F23645
-EXIT_COL  = #787B86
 
 // One swing point. isTop = true → GAMMA, false → BETTA.
 type Swing
@@ -274,25 +275,7 @@ if time >= startTime
         beyond    := na
         drawPivot(dir, high, low, time, stopLvl)
 
-    // 5) Trading hours: close on the last candle of the hours and start flat next time.
-    if not canTrade and dir != 0
-        label.new(x = bar_index, y = dir == 1 ? high : low, text = "EXIT " + str.tostring(close, format.mintick),
-             yloc = dir == 1 ? yloc.abovebar : yloc.belowbar, color = EXIT_COL, textcolor = color.white, size = size.small,
-             style = dir == 1 ? label.style_label_down : label.style_label_up)
-        strategy.close_all(comment = "Hours end", immediately = true)
-        dir       := 0
-        top       := Swing.new(true)
-        bot       := Swing.new(false)
-        pend      := na
-        beyond    := na
-        inherited := false
-        byDiff    := false
-        aHigh     := na
-        aLow      := na
-        aBar      := na
-        stopLvl   := na
-
-    // 6) Prices for the next candle.
+    // 5) Prices for the next candle.
     if dir == 1
         goLong  := na
         goShort := stopLvl
@@ -303,7 +286,8 @@ if time >= startTime
         goLong  := top.confirmed ? top.pHigh : na
         goShort := bot.confirmed ? bot.pLow : na
 
-    // 7) Orders, one tick beyond the level so an exact touch doesn't fill.
+    // 6) Orders, one tick beyond the level so an exact touch doesn't fill.
+    //    Outside the trading hours there are no orders; an open position just stays open.
     if not canTrade
         strategy.cancel_all()
         goLong  := na
