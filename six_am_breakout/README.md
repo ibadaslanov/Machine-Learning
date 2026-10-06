@@ -39,8 +39,10 @@ runs it several ways (`--mode`, or `--compare` for all at once):
 ## TradingView
 
 Paste `six_am_breakout.pine` into the Pine Editor, add it to a **5-minute**
-chart, and set the timezone input to your chart's timezone. It runs the
-default `flip` mode.
+chart, and set the timezone input to your chart's timezone. The Pine version
+defaults to **13:00** (12:55 reference candle). It keeps reversing between the
+13:00 high and low up to 2 times a day; the next cross after that closes the
+trade. Both are inputs.
 
 ## Usage (Python backtest)
 

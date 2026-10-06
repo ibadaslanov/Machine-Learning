@@ -1,59 +1,77 @@
 //@version=6
-strategy("06:00 Breakout + Reverse", overlay = true, pyramiding = 0,
+strategy("13:00 Breakout + Reverse", overlay = true, pyramiding = 0,
      default_qty_type = strategy.percent_of_equity, default_qty_value = 100, initial_capital = 10000)
 
 // Use on a 5-minute chart. Set the timezone to the one your chart shows.
-tz      = input.string("UTC", "Timezone (e.g. UTC, Asia/Baku, GMT+4)")
-sHour   = input.int(6, "Session hour", minval = 0, maxval = 23)
-sMinute = input.int(0, "Session minute", minval = 0, maxval = 55, step = 5)
+tz         = input.string("UTC", "Timezone (e.g. UTC, Asia/Baku, GMT+4)")
+sHour      = input.int(13, "Session hour", minval = 0, maxval = 23)
+sMinute    = input.int(0, "Session minute", minval = 0, maxval = 55, step = 5)
+maxRev     = input.int(2, "Max reversals per day", minval = 0)
+closeAfter = input.bool(true, "Close the trade on the next cross after the last reversal (off = hold to next session)")
 
 if timeframe.in_seconds() != 300
     runtime.error("Use a 5-minute chart")
 
 barT  = hour(time, tz) * 60 + minute(time, tz)
 sessT = sHour * 60 + sMinute
-isRef = barT == (sessT + 1435) % 1440   // the 05:55 candle
-isSig = barT == sessT                   // the 06:00 candle
+isRef = barT == (sessT + 1435) % 1440   // the 12:55 candle
+isSig = barT == sessT                   // the 13:00 candle
 
 var float refHigh  = na
 var float refLow   = na
+var float sigHigh  = na
+var float sigLow   = na
 var float revLevel = na
+var bool  active   = false              // today's setup is running
 var int   base     = 0                  // trade count when today's setup was armed
 
 trades = strategy.closedtrades + strategy.opentrades
-n      = trades - base                  // trades opened since 06:00 today
+n      = trades - base                  // entries today: first trade + each reversal
+pos    = strategy.position_size
 
-// Already reversed once: the reversed trade holds to the next 06:00, no more orders.
-if n >= 2
-    strategy.cancel_all()
-    revLevel := na
-
-// 06:00 candle closed: no breakout means no trade today,
-// otherwise move the reverse order to the 06:00 low (long) or high (short).
-if isSig
-    if n == 0
-        strategy.cancel_all()
-    else if n == 1
-        if strategy.position_size > 0
-            revLevel := low
-            strategy.entry("Short", strategy.short, stop = low, comment = "Reverse short")
-        else if strategy.position_size < 0
-            revLevel := high
-            strategy.entry("Long", strategy.long, stop = high, comment = "Reverse long")
-
-// 05:55 candle closed: close yesterday's trade at the 06:00 open and arm today's breakout.
-// The opposite stop doubles as the reverse order until the 06:00 candle closes.
 if isRef
+    // 12:55 candle closed: close yesterday's trade at the 13:00 open and arm today's breakout.
     strategy.cancel_all()
-    strategy.close_all(comment = "Next 06:00")
+    strategy.close_all(comment = "Next session")
     refHigh  := high
     refLow   := low
+    sigHigh  := na
+    sigLow   := na
     revLevel := na
     base     := trades
+    active   := true
     strategy.entry("Long", strategy.long, stop = refHigh, comment = "Break high")
     strategy.entry("Short", strategy.short, stop = refLow, comment = "Break low")
+else if active
+    if isSig
+        sigHigh := high
+        sigLow  := low
+    // Until the 13:00 candle closes, the reverse levels are the 12:55 high/low.
+    lvlHigh = na(sigHigh) ? refHigh : sigHigh
+    lvlLow  = na(sigLow) ? refLow : sigLow
+    if pos == 0
+        // No breakout in the 13:00 candle, or stopped out: done for today.
+        strategy.cancel_all()
+        active   := false
+        revLevel := na
+    else
+        revLevel := pos > 0 ? lvlLow : lvlHigh
+        if n - 1 < maxRev
+            // Reverse order: long -> sell stop at the 13:00 low, short -> buy stop at the 13:00 high.
+            if pos > 0
+                strategy.entry("Short", strategy.short, stop = lvlLow, comment = "Reverse short")
+            else
+                strategy.entry("Long", strategy.long, stop = lvlHigh, comment = "Reverse long")
+        else
+            // Reversals used up: the next cross closes the trade (or hold if switched off).
+            strategy.cancel("Long")
+            strategy.cancel("Short")
+            if closeAfter
+                strategy.exit("Stop", stop = revLevel, comment = "Stop")
+            else
+                revLevel := na
 
-plot(refHigh, "05:55 high", color.teal, 1, plot.style_stepline)
-plot(refLow, "05:55 low", color.red, 1, plot.style_stepline)
-plot(revLevel, "Reverse order", color.orange, 2, plot.style_linebr)
-bgcolor(isSig ? color.new(color.blue, 85) : na, title = "06:00 candle")
+plot(refHigh, "12:55 high", color.teal, 1, plot.style_stepline)
+plot(refLow, "12:55 low", color.red, 1, plot.style_stepline)
+plot(revLevel, "Reverse / stop", color.orange, 2, plot.style_linebr)
+bgcolor(isSig ? color.new(color.blue, 85) : na, title = "13:00 candle")
