@@ -1,0 +1,6 @@
+__pycache__/
+# keep personal photos and anything made from them out of this public repo
+*.jpg
+*.jpeg
+*.heic
+*lithophane*.stl
